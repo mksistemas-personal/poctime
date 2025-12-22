@@ -1,6 +1,6 @@
 package app.mkiniz.poctime.shared;
 
-import app.mkiniz.poctime.shared.business.DeleteBusinessUseCase;
+import app.mkiniz.poctime.shared.business.base.DeleteBusinessUseCase;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;

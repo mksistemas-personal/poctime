@@ -3,7 +3,7 @@ package app.mkiniz.poctime.person.services;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRepository;
 import app.mkiniz.poctime.person.domain.PersonResponse;
-import app.mkiniz.poctime.shared.business.GetAllBusinessUseCase;
+import app.mkiniz.poctime.shared.business.base.GetAllBusinessUseCase;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;

@@ -3,7 +3,7 @@ package app.mkiniz.poctime.person.adapters;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRequest;
 import app.mkiniz.poctime.person.domain.PersonResponse;
-import app.mkiniz.poctime.shared.business.*;
+import app.mkiniz.poctime.shared.business.base.*;
 import com.github.f4b6a3.tsid.Tsid;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

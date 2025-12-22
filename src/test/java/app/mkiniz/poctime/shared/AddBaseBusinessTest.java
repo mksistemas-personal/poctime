@@ -1,6 +1,6 @@
 package app.mkiniz.poctime.shared;
 
-import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
+import app.mkiniz.poctime.shared.business.base.AddBusinessUseCase;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;

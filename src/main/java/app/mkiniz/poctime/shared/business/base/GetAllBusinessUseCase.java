@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.shared.business;
+package app.mkiniz.poctime.shared.business.base;
 
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Pageable;

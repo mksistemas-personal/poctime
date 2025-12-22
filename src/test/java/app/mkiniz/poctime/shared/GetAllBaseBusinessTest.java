@@ -1,6 +1,6 @@
 package app.mkiniz.poctime.shared;
 
-import app.mkiniz.poctime.shared.business.GetAllBusinessUseCase;
+import app.mkiniz.poctime.shared.business.base.GetAllBusinessUseCase;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Objects;

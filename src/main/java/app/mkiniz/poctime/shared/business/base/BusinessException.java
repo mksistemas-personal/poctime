@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.shared.business;
+package app.mkiniz.poctime.shared.business.base;
 
 public class BusinessException extends RuntimeException {
     public BusinessException(String message) {
