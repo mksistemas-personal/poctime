@@ -44,6 +44,15 @@ public class Person extends AbstractAggregateRoot<Person> implements EntityCreat
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
+    public PersonKindEnumeration whatKind() {
+        if (Objects.isNull(document)) return PersonKindEnumeration.UNKNOWN;
+        return switch (document.getClass().getSimpleName()) {
+            case "CpfDocument" -> PersonKindEnumeration.CPF;
+            case "CnpjDocument" -> PersonKindEnumeration.CNPJ;
+            default -> PersonKindEnumeration.UNKNOWN;
+        };
+    }
+
     public void created() {
         this.registerEvent(new PersonAddedEvent(TsidGenerator.fromLongToString(id), name, document));
     }
