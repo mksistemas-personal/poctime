@@ -13,6 +13,7 @@ public record Address(
         String city,
         String state,
         String zipCode,
-        String country
+        String country,
+        String stateCode
 ) {
 }

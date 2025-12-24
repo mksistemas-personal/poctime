@@ -1,11 +1,18 @@
 package app.mkiniz.poctime.organization.domain;
 
+import app.mkiniz.poctime.organization.OrganizationConstants;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.business.address.Address;
+import app.mkiniz.poctime.shared.business.base.EntityCreated;
+import app.mkiniz.poctime.shared.business.base.EntityDeleted;
+import app.mkiniz.poctime.shared.business.base.EntityUpdated;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.domain.AbstractAggregateRoot;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "organization")
@@ -16,7 +23,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE organization SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
-public class Organization {
+public class Organization extends AbstractAggregateRoot<Person> implements EntityCreated, EntityUpdated, EntityDeleted {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
@@ -30,13 +37,34 @@ public class Organization {
     @Embedded
     private Address address;
 
-    @Column(name = "responsible_name", nullable = false, columnDefinition = "varchar(150)")
-    private String responsibleName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "responsible_id", foreignKey = @ForeignKey(name = "fk_organization_responsible"))
+    private Person responsiblePerson;
 
-    @Column(name = "responsible_email", nullable = false, columnDefinition = "varchar(150)")
+    @Column(name = "responsible_email", columnDefinition = "varchar(255)")
     private String responsibleEmail;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
+    public void valid() {
+        Objects.requireNonNull(person, OrganizationConstants.PERSON_NOT_NULL);
+        Objects.requireNonNull(address, OrganizationConstants.ADDRESS_NOT_NULL);
+        Objects.requireNonNull(responsiblePerson, OrganizationConstants.RESPONSIBLE_PERSON_NOT_NULL);
+        Objects.requireNonNull(responsibleEmail, OrganizationConstants.RESPONSIBLE_EMAIL_NOT_NULL);
+    }
+
+    @Override
+    public void created() {
+    }
+
+    @Override
+    public void deleted() {
+
+    }
+
+    @Override
+    public void updated() {
+
+    }
 }
