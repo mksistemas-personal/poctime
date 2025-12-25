@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.shared.business.address;
+package app.mkiniz.poctime.base.address;
 
 import java.util.Arrays;
 import java.util.List;

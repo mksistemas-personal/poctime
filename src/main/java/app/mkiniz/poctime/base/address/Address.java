@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.shared.business.address;
+package app.mkiniz.poctime.base.address;
 
 import jakarta.persistence.Embeddable;
 import lombok.Builder;

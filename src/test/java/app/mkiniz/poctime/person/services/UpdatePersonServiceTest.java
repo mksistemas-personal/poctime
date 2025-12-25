@@ -7,7 +7,7 @@ import app.mkiniz.poctime.person.domain.PersonRepository;
 import app.mkiniz.poctime.person.domain.PersonRequest;
 import app.mkiniz.poctime.person.domain.PersonResponse;
 import app.mkiniz.poctime.shared.UpdateBaseBusinessTest;
-import app.mkiniz.poctime.shared.business.base.BusinessException;
+import app.mkiniz.poctime.shared.business.BusinessException;
 import com.github.f4b6a3.tsid.Tsid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

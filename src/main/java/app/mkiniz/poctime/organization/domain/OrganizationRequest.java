@@ -1,7 +1,7 @@
 package app.mkiniz.poctime.organization.domain;
 
+import app.mkiniz.poctime.base.address.Address;
 import app.mkiniz.poctime.organization.OrganizationConstants;
-import app.mkiniz.poctime.shared.business.address.Address;
 import com.github.f4b6a3.tsid.Tsid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

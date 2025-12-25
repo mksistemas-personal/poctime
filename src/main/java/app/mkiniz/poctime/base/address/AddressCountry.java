@@ -1,7 +1,10 @@
-package app.mkiniz.poctime.shared.business.address;
+package app.mkiniz.poctime.base.address;
+
+import app.mkiniz.poctime.shared.business.BusinessException;
+import cyclops.control.Either;
 
 public interface AddressCountry {
-    void validate(Address address);
+    Either<BusinessException, Address> validate(Address address);
 
     Address canonicalize(Address address);
 

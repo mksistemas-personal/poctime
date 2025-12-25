@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.shared.business.base;
+package app.mkiniz.poctime.shared.business;
 
 public interface UpdateBusinessUseCase<TKey, TRequest, TResponse> extends BusinessUseCase<TRequest, TResponse> {
     TResponse execute(TKey id, TRequest request);

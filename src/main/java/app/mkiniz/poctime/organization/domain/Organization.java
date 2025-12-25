@@ -1,11 +1,12 @@
 package app.mkiniz.poctime.organization.domain;
 
+import app.mkiniz.poctime.base.address.Address;
 import app.mkiniz.poctime.organization.OrganizationConstants;
 import app.mkiniz.poctime.person.domain.Person;
-import app.mkiniz.poctime.shared.business.address.Address;
-import app.mkiniz.poctime.shared.business.base.EntityCreated;
-import app.mkiniz.poctime.shared.business.base.EntityDeleted;
-import app.mkiniz.poctime.shared.business.base.EntityUpdated;
+import app.mkiniz.poctime.shared.business.EntityCreated;
+import app.mkiniz.poctime.shared.business.EntityDeleted;
+import app.mkiniz.poctime.shared.business.EntityUpdated;
+import com.github.f4b6a3.tsid.Tsid;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -56,6 +57,12 @@ public class Organization extends AbstractAggregateRoot<Person> implements Entit
 
     @Override
     public void created() {
+        this.registerEvent(OrganizationAddedEvent.builder()
+                .organizationId(Tsid.from(this.id))
+                .responsibleId(Tsid.from(responsiblePerson.getId()))
+                .responsibleEmail(responsibleEmail)
+                .address(address)
+                .build());
     }
 
     @Override

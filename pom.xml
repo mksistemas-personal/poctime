@@ -79,6 +79,12 @@
             <version>2.1.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.oath.cyclops</groupId>
+            <artifactId>cyclops</artifactId>
+            <version>10.4.1</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/net.kaczmarzyk/specification-arg-resolver -->
         <dependency>
             <groupId>net.kaczmarzyk</groupId>

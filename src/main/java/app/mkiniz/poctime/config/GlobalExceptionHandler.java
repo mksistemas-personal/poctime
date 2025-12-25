@@ -1,6 +1,6 @@
 package app.mkiniz.poctime.shared.adapter;
 
-import app.mkiniz.poctime.shared.business.base.BusinessException;
+import app.mkiniz.poctime.shared.business.BusinessException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
