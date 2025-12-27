@@ -12,4 +12,7 @@ public class OrganizationConstants {
     public static final String PERSON_NOT_NULL = "organization.person.not.null";
     public static final String RESPONSIBLE_PERSON_NOT_NULL = "organization.responsible.person.not.null";
     public static final String RESPONSIBLE_EMAIL_NOT_NULL = "organization.responsible.email.not.null";
+
+    // STREAM CONSTANTS
+    public static final String ORGANIZATION_BINDING_NAME = "exchangeOrganization-out-0";
 }

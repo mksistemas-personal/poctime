@@ -27,11 +27,17 @@ spring:
         exchangePerson-out-0:
           destination: exchange.person
           content-type: application/json
+        exchangeOrganization-out-0:
+          destination: exchange.organization
+          content-type: application/json
       rabbit:
-        binder:
-          auto-bind-dlq: true
         bindings:
           exchangePerson-out-0:
+            producer:
+              routing-key-expression: "''"
+              exchangeType: headers
+              declare-exchange: true
+          exchangeOrganization-out-0:
             producer:
               routing-key-expression: "''"
               exchangeType: headers
