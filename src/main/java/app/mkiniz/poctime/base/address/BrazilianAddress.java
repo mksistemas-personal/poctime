@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 import java.util.Optional;
 
 @Component("address-br")
-class BrasilianAddress implements AddressCountry {
+public class BrazilianAddress implements AddressCountry {
 
     private static final String zipCodeRegex = "^[0-9]{5}-[0-9]{3}$";
 

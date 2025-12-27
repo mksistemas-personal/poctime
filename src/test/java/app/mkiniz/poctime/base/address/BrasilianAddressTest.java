@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BrasilianAddressTest {
 
-    private BrasilianAddress executer;
+    private BrazilianAddress executer;
     private Address completAddress;
 
     @BeforeEach
     void setUp() {
-        this.executer = new BrasilianAddress();
+        this.executer = new BrazilianAddress();
         this.completAddress = Address.builder()
                 .state("Santa Catarina")
                 .city("Lages")
@@ -89,6 +89,41 @@ class BrasilianAddressTest {
                 .complement(completAddress.complement())
                 .build();
         validateField(address, AddressCountry.COUNTRY_INVALID);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void validateZipCodeEmpty(String zipCode) {
+        Address address = Address.builder()
+                .street(completAddress.street())
+                .country(completAddress.country())
+                .zipCode(zipCode)
+                .number(completAddress.number())
+                .city(completAddress.city())
+                .state(completAddress.state())
+                .stateCode(completAddress.stateCode())
+                .neighborhood(completAddress.neighborhood())
+                .complement(completAddress.complement())
+                .build();
+        validateField(address, AddressCountry.ZIP_CODE_REQUIRED);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"88506000", "88506-A00", "A88506-000"})
+    void validateZipCodeInvalid(String zipCode) {
+        Address address = Address.builder()
+                .street(completAddress.street())
+                .country(completAddress.country())
+                .zipCode(zipCode)
+                .number(completAddress.number())
+                .city(completAddress.city())
+                .state(completAddress.state())
+                .stateCode(completAddress.stateCode())
+                .neighborhood(completAddress.neighborhood())
+                .complement(completAddress.complement())
+                .build();
+        validateField(address, AddressCountry.ZIP_CODE_INVALID);
     }
 
     private void validateField(Address address, String message) {

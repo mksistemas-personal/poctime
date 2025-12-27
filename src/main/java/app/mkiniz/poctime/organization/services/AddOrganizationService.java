@@ -51,6 +51,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
 
     private Either<BusinessException, Context> createOrganization(Context context) {
         Organization organization = Organization.builder()
+                .id(context.person.getId())
                 .person(context.person)
                 .responsiblePerson(context.responsiblePerson)
                 .responsibleEmail(context.getResponsibleEmail())
@@ -72,6 +73,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     private Either<BusinessException, Context> validateAddress(Context context) {
         AddressCountry addressCountry = beanFactory.getBean(
                 AddressCountry.getCountry(context.getPersonCountry()), AddressCountry.class);
+        context.addressCountry = addressCountry;
         return addressCountry.validate(context.getAddress())
                 .map(address -> context);
     }
@@ -91,8 +93,8 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     Either<BusinessException, Context> findOrganization(Context context) {
         Optional<Organization> org = organizationRepository.findById(context.getPersonIdAsLong());
         return org.isEmpty() ?
-                Either.left(new BusinessException(OrganizationConstants.DUPLICATED)) :
-                Either.right(context);
+                Either.right(context) :
+                Either.left(new BusinessException(OrganizationConstants.DUPLICATED));
     }
 
 
