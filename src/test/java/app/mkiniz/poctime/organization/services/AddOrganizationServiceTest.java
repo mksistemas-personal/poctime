@@ -6,10 +6,8 @@ import app.mkiniz.poctime.base.address.BrazilianAddress;
 import app.mkiniz.poctime.base.document.bra.CnpjDocument;
 import app.mkiniz.poctime.base.document.bra.CpfDocument;
 import app.mkiniz.poctime.organization.OrganizationConstants;
-import app.mkiniz.poctime.organization.domain.Organization;
-import app.mkiniz.poctime.organization.domain.OrganizationRepository;
-import app.mkiniz.poctime.organization.domain.OrganizationRequest;
-import app.mkiniz.poctime.organization.domain.OrganizationResponse;
+import app.mkiniz.poctime.organization.domain.*;
+import app.mkiniz.poctime.organization.domain.countries.BrazilianOrganizationCountryValidation;
 import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.AddBaseBusinessTest;
@@ -113,8 +111,13 @@ class AddOrganizationServiceTest {
                     when(personProvider.getPerson(responsibleId)).thenReturn(Optional.of(responsiblePerson));
                     when(organizationRepository.findById(anyLong())).thenReturn(Optional.empty());
                     when(organizationRepository.save(any(Organization.class)))
-                            .thenAnswer(invocation -> invocation.getArgument(0));
+                            .thenAnswer(invocation -> {
+                                Organization org = invocation.getArgument(0);
+                                org.setId(personId.toLong());
+                                return org;
+                            });
                     when(beanFactory.getBean("address-br", AddressCountry.class)).thenReturn(new BrazilianAddress());
+                    when(beanFactory.getBean("organization-country-br", OrganizationCountryValidation.class)).thenReturn(new BrazilianOrganizationCountryValidation());
                     return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
@@ -133,6 +136,7 @@ class AddOrganizationServiceTest {
                     verify(personProvider, times(1)).getPerson(personId);
                     verify(personProvider, times(1)).getPerson(responsibleId);
                     verify(beanFactory, times(1)).getBean("address-br", AddressCountry.class);
+                    verify(beanFactory, times(1)).getBean("organization-country-br", OrganizationCountryValidation.class);
                     verify(organizationRepository, times(1)).save(any(Organization.class));
                 })
                 .execute();

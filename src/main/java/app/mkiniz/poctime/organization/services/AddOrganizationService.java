@@ -3,10 +3,7 @@ package app.mkiniz.poctime.organization.services;
 import app.mkiniz.poctime.base.address.Address;
 import app.mkiniz.poctime.base.address.AddressCountry;
 import app.mkiniz.poctime.organization.OrganizationConstants;
-import app.mkiniz.poctime.organization.domain.Organization;
-import app.mkiniz.poctime.organization.domain.OrganizationRepository;
-import app.mkiniz.poctime.organization.domain.OrganizationRequest;
-import app.mkiniz.poctime.organization.domain.OrganizationResponse;
+import app.mkiniz.poctime.organization.domain.*;
 import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
@@ -28,6 +25,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     private final OrganizationRepository organizationRepository;
     private final PersonProvider personProvider;
     private final BeanFactory beanFactory;
+    private final OrganizationCountryValidation organizationCountryValidation;
 
     @Override
     public OrganizationResponse execute(OrganizationRequest request) {
@@ -37,6 +35,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
                 .flatMap(this::validateAddress)
                 .flatMap(this::findResponsiblePerson)
                 .flatMap(this::createOrganization)
+                .flatMap(this::validateOrganizationPerson)
                 .flatMap(this::saveOrganization)
                 .map(context -> OrganizationResponse.from(context.organization))
                 .fold(error -> {
@@ -45,21 +44,26 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     }
 
     private Either<BusinessException, Context> saveOrganization(Context context) {
+        context.organization.created();
         context.organization = organizationRepository.save(context.organization);
         return Either.right(context);
     }
 
     private Either<BusinessException, Context> createOrganization(Context context) {
-        Organization organization = Organization.builder()
-                .id(context.person.getId())
+        context.organization = Organization.builder()
                 .person(context.person)
                 .responsiblePerson(context.responsiblePerson)
                 .responsibleEmail(context.getResponsibleEmail())
                 .address(context.addressCountry.canonicalize(context.getAddress()))
                 .build();
-        organization.created();
-        context.organization = organization;
         return Either.right(context);
+    }
+
+    private Either<BusinessException, Context> validateOrganizationPerson(Context context) {
+        OrganizationCountryValidation organizationCountryValidation = beanFactory.getBean(
+                OrganizationCountryValidation.getCountry(context.getPersonCountry()), OrganizationCountryValidation.class);
+        return organizationCountryValidation.validateOrganizationByCountry(context.organization)
+                .map(org -> context);
     }
 
     private Either<BusinessException, Context> findResponsiblePerson(Context context) {

@@ -12,7 +12,11 @@ public class OrganizationConstants {
     public static final String PERSON_NOT_NULL = "organization.person.not.null";
     public static final String RESPONSIBLE_PERSON_NOT_NULL = "organization.responsible.person.not.null";
     public static final String RESPONSIBLE_EMAIL_NOT_NULL = "organization.responsible.email.not.null";
+    public static final String ORGANIZATION_COUNTRY_RESPONSIBLE_INVALID = "organization.country.responsible.invalid";
+    public static final String ORGANIZATION_PERSON_COUNTRY_WRONG_TYPE = "organization.person.country.wrong.type";
+    public static final String ORGANIZATION_RESPONSIBLE_PERSON_COUNTRY_WRONG_TYPE = "organization.responsible.person.country.wrong.type";
 
     // STREAM CONSTANTS
     public static final String ORGANIZATION_BINDING_NAME = "exchangeOrganization-out-0";
+
 }

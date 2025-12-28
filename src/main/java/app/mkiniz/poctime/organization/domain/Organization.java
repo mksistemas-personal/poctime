@@ -58,7 +58,7 @@ public class Organization extends AbstractAggregateRoot<Person> implements Entit
     @Override
     public void created() {
         this.registerEvent(OrganizationAddedEvent.builder()
-                .organizationId(Tsid.from(this.id))
+                .organizationId(Tsid.from(this.person.getId()))
                 .responsibleId(Tsid.from(responsiblePerson.getId()))
                 .responsibleEmail(responsibleEmail)
                 .address(address)
@@ -74,4 +74,17 @@ public class Organization extends AbstractAggregateRoot<Person> implements Entit
     public void updated() {
 
     }
+
+    public boolean isPersonAndResponsibleSameCountry() {
+        return getPersonCountry().equals(getResponsibleCountry());
+    }
+
+    private String getResponsibleCountry() {
+        return responsiblePerson.getDocument().getCountry();
+    }
+
+    private String getPersonCountry() {
+        return person.getDocument().getCountry();
+    }
+
 }

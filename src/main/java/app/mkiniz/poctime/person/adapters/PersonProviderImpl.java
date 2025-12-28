@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.person.services;
+package app.mkiniz.poctime.person.adapters;
 
 import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;

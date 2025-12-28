@@ -1,7 +1,8 @@
 package app.mkiniz.poctime.organization.adapters;
 
 import app.mkiniz.poctime.organization.domain.OrganizationRequest;
-import app.mkiniz.poctime.person.domain.PersonResponse;
+import app.mkiniz.poctime.organization.domain.OrganizationResponse;
+import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class OrganizationController {
 
+    private final AddBusinessUseCase<OrganizationRequest, OrganizationResponse> addOrganizationService;
+
     @PostMapping
-    public PersonResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
-        return null;
+    public OrganizationResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
+        return addOrganizationService.execute(request);
     }
 }

@@ -4,12 +4,15 @@ import app.mkiniz.poctime.shared.business.BusinessException;
 import cyclops.control.Either;
 
 public interface AddressCountry {
+
+    String ADDRESS = "address-";
+
     Either<BusinessException, Address> validate(Address address);
 
     Address canonicalize(Address address);
 
     static String getCountry(String countryCode) {
-        return ("Address-" + countryCode).toLowerCase();
+        return (ADDRESS + countryCode).toLowerCase();
     }
 
     static final String STREET_REQUIRED = "address.street.required";
