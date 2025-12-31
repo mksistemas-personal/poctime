@@ -25,32 +25,33 @@ class AddPersonService implements AddBusinessUseCase<PersonRequest, PersonRespon
 
     @Override
     public PersonResponse execute(PersonRequest request) {
-        return Either.<BusinessException, Context>right(new Context(request))
-                .flatMap(context -> {
-                    Optional<Person> person = personRepository.findByDocument(context.request.document());
-                    return person.isEmpty() ? Either.right(context) : Either.left(new BusinessException(PersonConstants.DUPLICATED));
-                })
-                .flatMap(context -> {
-                    context.person = Person.builder()
-                            .id(tsidGenerator.newIdAsLong())
-                            .name(context.request.name())
-                            .document(context.request.document())
-                            .build();
-                    return Either.right(context);
-                })
+        return (PersonResponse) Either.<BusinessException, Context>right(new Context(request))
+                .flatMap(this::findDuplicateDocument)
+                .flatMap(this::createPerson)
                 .flatMap(context -> context.person.valid().map(org -> context))
-                .flatMap(context -> {
-                    context.person.created();
-                    context.person = personRepository.save(context.person);
-                    return Either.right(context);
-                })
+                .flatMap(this::savePerson)
                 .map(context -> PersonResponse.fromPerson(context.person))
-                .fold(
-                        error -> {
-                            throw error;
-                        },
-                        response -> response
-                );
+                .fold(this::throwBusinessException, person -> person);
+    }
+
+    private Either<? extends BusinessException, ? extends Context> findDuplicateDocument(Context context) {
+        Optional<Person> person = personRepository.findByDocument(context.request.document());
+        return person.isEmpty() ? Either.right(context) : Either.left(new BusinessException(PersonConstants.DUPLICATED));
+    }
+
+    private Either<? extends BusinessException, ? extends Context> createPerson(Context context) {
+        context.person = Person.builder()
+                .id(tsidGenerator.newIdAsLong())
+                .name(context.request.name())
+                .document(context.request.document())
+                .build();
+        return Either.right(context);
+    }
+
+    private Either<? extends BusinessException, ? extends Context> savePerson(Context context) {
+        context.person.created();
+        context.person = personRepository.save(context.person);
+        return Either.right(context);
     }
 
     private static class Context {

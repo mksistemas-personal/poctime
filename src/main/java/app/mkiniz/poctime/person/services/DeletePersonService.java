@@ -21,7 +21,7 @@ class DeletePersonService implements DeleteBusinessUseCase<Tsid, PersonResponse>
 
     @Override
     public PersonResponse execute(Tsid id) {
-        return Either.<BusinessException, Tsid>right(id)
+        return (PersonResponse) Either.<BusinessException, Tsid>right(id)
                 .flatMap(identifier -> personRepository.findById(identifier.toLong())
                         .<Either<BusinessException, Person>>map(Either::right)
                         .orElseGet(() -> Either.left(new BusinessException(PersonConstants.ID_NOT_FOUND))))
@@ -31,8 +31,6 @@ class DeletePersonService implements DeleteBusinessUseCase<Tsid, PersonResponse>
                     return Either.right(person);
                 })
                 .map(PersonResponse::fromPerson)
-                .fold(error -> {
-                    throw error;
-                }, personResponse -> personResponse);
+                .fold(this::throwBusinessException, personResponse -> personResponse);
     }
 }
