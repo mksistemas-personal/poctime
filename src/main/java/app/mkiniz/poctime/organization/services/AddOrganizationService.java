@@ -25,7 +25,6 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     private final OrganizationRepository organizationRepository;
     private final PersonProvider personProvider;
     private final BeanFactory beanFactory;
-    private final OrganizationCountryValidation organizationCountryValidation;
 
     @Override
     public OrganizationResponse execute(OrganizationRequest request) {
@@ -63,6 +62,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
         OrganizationCountryValidation organizationCountryValidation = beanFactory.getBean(
                 OrganizationCountryValidation.getCountry(context.getPersonCountry()), OrganizationCountryValidation.class);
         return organizationCountryValidation.validateOrganizationByCountry(context.organization)
+                .flatMap(Organization::valid)
                 .map(org -> context);
     }
 

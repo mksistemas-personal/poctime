@@ -42,7 +42,7 @@ class UpdatePersonServiceTest {
 
     @BeforeEach
     void setUp() {
-        this.baseTest = UpdateBaseBusinessTest.<Tsid, PersonRequest, PersonResponse>of();
+        this.baseTest = UpdateBaseBusinessTest.of();
     }
 
     @Test
@@ -58,7 +58,7 @@ class UpdatePersonServiceTest {
                     return new PersonRequest(NAME_UPDATED, CPF_DOCUMENT_UPDATED);
                 })
                 .when(() -> new UpdatePersonService(personRepository))
-                .then((request, response) -> {
+                .then((id, request, response) -> {
                     verify(personRepository, times(1)).save(personCaptor.capture());
                     verify(personRepository, times(1)).findById(anyLong());
                     verify(personRepository, times(1)).findByDocument(CPF_DOCUMENT_UPDATED);
@@ -85,7 +85,7 @@ class UpdatePersonServiceTest {
                     return new PersonRequest(NAME_UPDATED, CPF_DOCUMENT_UPDATED);
                 })
                 .when(() -> new UpdatePersonService(personRepository))
-                .then((request, response) -> {
+                .then((id, request, response) -> {
                     verify(personRepository, times(1)).save(personCaptor.capture());
                     verify(personRepository, times(1)).findById(anyLong());
                     verify(personRepository, times(0)).findByDocument(CPF_DOCUMENT_UPDATED);
@@ -109,7 +109,7 @@ class UpdatePersonServiceTest {
                     return new PersonRequest(NAME_UPDATED, CPF_DOCUMENT_UPDATED);
                 })
                 .when(() -> new UpdatePersonService(personRepository))
-                .then((request, response) -> {
+                .then((id, request, response) -> {
 
                 })
                 .execute(Tsid.from(2L)));
@@ -126,7 +126,7 @@ class UpdatePersonServiceTest {
                     return new PersonRequest(NAME_UPDATED, INVALID_CPF_DOCUMENT);
                 })
                 .when(() -> new UpdatePersonService(personRepository))
-                .then((request, response) -> {
+                .then((id, request, response) -> {
                 })
                 .execute(Tsid.from(1L)));
         verify(personRepository, times(0)).save(any(Person.class));
@@ -145,7 +145,7 @@ class UpdatePersonServiceTest {
                     return new PersonRequest(NAME_UPDATED, CPF_DOCUMENT_UPDATED);
                 })
                 .when(() -> new UpdatePersonService(personRepository))
-                .then((request, response) -> {
+                .then((id, request, response) -> {
                 })
                 .execute(Tsid.from(1L)));
         verify(personRepository, times(0)).save(any(Person.class));
