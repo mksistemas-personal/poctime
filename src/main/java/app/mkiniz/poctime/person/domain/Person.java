@@ -7,6 +7,7 @@ import app.mkiniz.poctime.shared.business.BusinessException;
 import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
+import cyclops.control.Either;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -66,8 +67,9 @@ public class Person extends AbstractAggregateRoot<Person> implements EntityCreat
         this.registerEvent(new PersonDeletedEvent(TsidGenerator.fromLongToString(id), name, document));
     }
 
-    public void valid() {
+    public Either<BusinessException, Person> valid() {
         if (Objects.nonNull(document) && !document.isValid())
-            throw new BusinessException(PersonConstants.DOCUMENT_INVALID);
+            return Either.left(new BusinessException(PersonConstants.DOCUMENT_INVALID));
+        return Either.right(this);
     }
 }
