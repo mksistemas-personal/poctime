@@ -33,9 +33,8 @@ public class Organization extends AbstractAggregateRoot<Person> implements Entit
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "fk_organization_person"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", foreignKey = @ForeignKey(name = "fk_organization_person"))
     private Person person;
 
     @Embedded

@@ -1,7 +1,7 @@
 package app.mkiniz.poctime.organization;
 
 public class OrganizationConstants {
-    public static final String DUPLICATED = "organization.duplicated";
+    public static final String DUPLICATED = "organization.person.duplicated";
     public static final String PERSON_NOT_FOUND = "organization.person.not.found";
     public static final String RESPONSIBLE_PERSON_NOT_FOUND = "organization.responsible.person.not.found";
     public static final String PERSON_ID_NOT_NULL = "organization.person.id.not.null";

@@ -42,9 +42,6 @@ class AddOrganizationServiceTest {
     @Mock
     private PersonProvider personProvider;
 
-    @InjectMocks
-    private TsidGenerator tsidGenerator;
-
     @Mock
     private BeanFactory beanFactory;
 
@@ -62,11 +59,10 @@ class AddOrganizationServiceTest {
     private Person person;
     private Person responsiblePerson;
     private Organization organization;
-    private Address canonizedAddress;
 
     @BeforeEach
     void setUp() {
-        this.baseTest = AddBaseBusinessTest.<OrganizationRequest, OrganizationResponse>of();
+        this.baseTest = AddBaseBusinessTest.of();
         TsidGenerator generator = new TsidGenerator();
         this.personId = generator.newTsid();
         this.responsibleId = generator.newTsid();
@@ -81,7 +77,7 @@ class AddOrganizationServiceTest {
                 .number("3185")
                 .country("BR")
                 .build();
-        this.canonizedAddress = new BrazilianAddress().canonicalize(address);
+        Address canonizedAddress = new BrazilianAddress().canonicalize(address);
         this.responsibleEmail = "responsible@example.com";
         this.person = Person.builder()
                 .id(personId.toLong())
@@ -109,7 +105,7 @@ class AddOrganizationServiceTest {
                 .given(() -> {
                     when(personProvider.getPerson(personId)).thenReturn(Optional.of(person));
                     when(personProvider.getPerson(responsibleId)).thenReturn(Optional.of(responsiblePerson));
-                    when(organizationRepository.findById(anyLong())).thenReturn(Optional.empty());
+                    when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.empty());
                     when(organizationRepository.save(any(Organization.class)))
                             .thenAnswer(invocation -> {
                                 Organization org = invocation.getArgument(0);
@@ -132,7 +128,7 @@ class AddOrganizationServiceTest {
                             .usingRecursiveComparison()
                             .ignoringFields("domainEvents")
                             .isEqualTo(organization);
-                    verify(organizationRepository, times(1)).findById(personId.toLong());
+                    verify(organizationRepository, times(1)).findByPersonId(personId.toLong());
                     verify(personProvider, times(1)).getPerson(personId);
                     verify(personProvider, times(1)).getPerson(responsibleId);
                     verify(beanFactory, times(1)).getBean("address-br", AddressCountry.class);
@@ -146,13 +142,11 @@ class AddOrganizationServiceTest {
     void addOrganizationWithOrganizationTest() {
         BusinessException exception = assertThrows(BusinessException.class, () -> this.baseTest
                 .given(() -> {
-                    when(organizationRepository.findById(anyLong())).thenReturn(Optional.of(organization));
+                    when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.of(organization));
                     return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
-                .then((request, response) -> {
-                    fail();
-                })
+                .then((request, response) -> fail())
                 .execute()
         );
         assertThat(exception.getMessage()).isEqualTo(OrganizationConstants.DUPLICATED);
@@ -162,14 +156,12 @@ class AddOrganizationServiceTest {
     void addOrganizationWithNoPersonTest() {
         BusinessException exception = assertThrows(BusinessException.class, () -> this.baseTest
                 .given(() -> {
-                    when(organizationRepository.findById(anyLong())).thenReturn(Optional.empty());
+                    when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.empty());
                     when(personProvider.getPerson(personId)).thenReturn(Optional.empty());
                     return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
-                .then((request, response) -> {
-                    fail();
-                })
+                .then((request, response) -> fail())
                 .execute()
         );
         assertThat(exception.getMessage()).isEqualTo(OrganizationConstants.PERSON_NOT_FOUND);
@@ -179,16 +171,14 @@ class AddOrganizationServiceTest {
     void addOrganizationWithNoResponsiblePersonTest() {
         BusinessException exception = assertThrows(BusinessException.class, () -> this.baseTest
                 .given(() -> {
-                    when(organizationRepository.findById(anyLong())).thenReturn(Optional.empty());
+                    when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.empty());
                     when(personProvider.getPerson(personId)).thenReturn(Optional.of(person));
                     when(personProvider.getPerson(responsibleId)).thenReturn(Optional.empty());
                     when(beanFactory.getBean("address-br", AddressCountry.class)).thenReturn(new BrazilianAddress());
                     return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
-                .then((request, response) -> {
-                    fail();
-                })
+                .then((request, response) -> fail())
                 .execute()
         );
         assertThat(exception.getMessage()).isEqualTo(OrganizationConstants.RESPONSIBLE_PERSON_NOT_FOUND);

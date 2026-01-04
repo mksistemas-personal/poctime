@@ -6,6 +6,7 @@ import app.mkiniz.poctime.organization.OrganizationConstants;
 import app.mkiniz.poctime.organization.domain.*;
 import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;
+import app.mkiniz.poctime.shared.adapter.TsidGenerator;
 import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import com.github.f4b6a3.tsid.Tsid;
@@ -50,6 +51,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
 
     private Either<BusinessException, Context> createOrganization(Context context) {
         context.organization = Organization.builder()
+                .id(new TsidGenerator().newIdAsLong())
                 .person(context.person)
                 .responsiblePerson(context.responsiblePerson)
                 .responsibleEmail(context.getResponsibleEmail())
@@ -95,7 +97,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     }
 
     Either<BusinessException, Context> findOrganization(Context context) {
-        Optional<Organization> org = organizationRepository.findById(context.getPersonIdAsLong());
+        Optional<Organization> org = organizationRepository.findByPersonId(context.getPersonIdAsLong());
         return org.isEmpty() ?
                 Either.right(context) :
                 Either.left(new BusinessException(OrganizationConstants.DUPLICATED));
