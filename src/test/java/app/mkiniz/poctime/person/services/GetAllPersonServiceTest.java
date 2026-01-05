@@ -4,7 +4,6 @@ import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRepository;
 import app.mkiniz.poctime.person.domain.PersonResponse;
 import app.mkiniz.poctime.shared.GetAllBaseBusinessTest;
-import cyclops.control.Maybe;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
 import net.kaczmarzyk.spring.data.jpa.web.DefaultQueryContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -29,7 +29,7 @@ class GetAllPersonServiceTest {
     @Mock
     private PersonRepository personRepository;
 
-    private GetAllBaseBusinessTest<Specification<Person>, Maybe<Slice<PersonResponse>>> baseTest;
+    private GetAllBaseBusinessTest<Specification<Person>, Slice<PersonResponse>> baseTest;
 
     @BeforeEach
     void setUp() {
@@ -51,11 +51,17 @@ class GetAllPersonServiceTest {
                                     )));
                     return new Like<>(new DefaultQueryContext(), "name", "name");
                 })
-                .when(() -> new GetAllPersonService(personRepository))
+                .when((pageableData, request) -> {
+                    GetAllPersonService service = new GetAllPersonService(personRepository);
+                    return service.execute(pageableData, request)
+                            .fold(
+                                    slice -> slice,
+                                    () -> new SliceImpl<>(List.of())
+                            );
+                })
                 .then((request, response) -> {
                     assertNotNull(response);
-                    Slice<?> slice = (Slice<?>) response.fold(s -> s, s -> s);
-                    assertEquals(2, slice.getNumberOfElements());
+                    assertEquals(2, response.getNumberOfElements());
                     verify(personRepository, times(1)).findAll(request, pageable);
                     verify(personRepository, never()).findAll(pageable);
                 })
@@ -76,11 +82,17 @@ class GetAllPersonServiceTest {
                                     )));
                     return null;
                 })
-                .when(() -> new GetAllPersonService(personRepository))
+                .when((pageableData, request) -> {
+                    GetAllPersonService service = new GetAllPersonService(personRepository);
+                    return service.execute(pageableData, request)
+                            .fold(
+                                    slice -> slice,
+                                    () -> new SliceImpl<>(List.of())
+                            );
+                })
                 .then((request, response) -> {
                     assertNotNull(response);
-                    Slice<?> slice = (Slice<?>) response.fold(s -> s, s -> s);
-                    assertEquals(2, slice.getNumberOfElements());
+                    assertEquals(2, response.getNumberOfElements());
                     verify(personRepository, times(1)).findAll(pageable);
                     verify(personRepository, never()).findAll(request, pageable);
                 })
