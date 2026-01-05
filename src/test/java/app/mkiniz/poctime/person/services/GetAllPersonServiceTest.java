@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -32,9 +33,10 @@ class GetAllPersonServiceTest {
 
     @BeforeEach
     void setUp() {
-        this.baseTest = GetAllBaseBusinessTest.<Specification<Person>, Slice<PersonResponse>>of();
+        this.baseTest = GetAllBaseBusinessTest.of();
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void getAllPerfectWithSpecificationTest() {
         final Pageable pageable = Pageable.ofSize(10);
@@ -43,13 +45,20 @@ class GetAllPersonServiceTest {
                     when(personRepository
                             .findAll(any(Specification.class), any(Pageable.class)))
                             .thenReturn(
-                                    new PageImpl(List.of(
+                                    new PageImpl<>(List.of(
                                             Person.builder().id(1L).name("name-1").build(),
                                             Person.builder().id(2L).name("name-2").build()
                                     )));
-                    return new Like<Person>(new DefaultQueryContext(), "name", "name");
+                    return new Like<>(new DefaultQueryContext(), "name", "name");
                 })
-                .when(() -> new GetAllPersonService(personRepository))
+                .when((pageableData, request) -> {
+                    GetAllPersonService service = new GetAllPersonService(personRepository);
+                    return service.execute(pageableData, request)
+                            .fold(
+                                    slice -> slice,
+                                    () -> new SliceImpl<>(List.of())
+                            );
+                })
                 .then((request, response) -> {
                     assertNotNull(response);
                     assertEquals(2, response.getNumberOfElements());
@@ -67,13 +76,20 @@ class GetAllPersonServiceTest {
                     when(personRepository
                             .findAll(any(Pageable.class)))
                             .thenReturn(
-                                    new PageImpl(List.of(
+                                    new PageImpl<>(List.of(
                                             Person.builder().id(1L).name("name-1").build(),
                                             Person.builder().id(2L).name("name-2").build()
                                     )));
                     return null;
                 })
-                .when(() -> new GetAllPersonService(personRepository))
+                .when((pageableData, request) -> {
+                    GetAllPersonService service = new GetAllPersonService(personRepository);
+                    return service.execute(pageableData, request)
+                            .fold(
+                                    slice -> slice,
+                                    () -> new SliceImpl<>(List.of())
+                            );
+                })
                 .then((request, response) -> {
                     assertNotNull(response);
                     assertEquals(2, response.getNumberOfElements());
