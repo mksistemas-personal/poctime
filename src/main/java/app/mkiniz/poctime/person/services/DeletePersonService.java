@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.person.services;
 
+import app.mkiniz.poctime.organization.OrganizationProvider;
 import app.mkiniz.poctime.person.PersonConstants;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRepository;
@@ -18,19 +19,33 @@ import org.springframework.transaction.annotation.Transactional;
 class DeletePersonService implements DeleteBusinessUseCase<Tsid, PersonResponse> {
 
     private final PersonRepository personRepository;
+    private final OrganizationProvider organizationProvider;
 
     @Override
     public PersonResponse execute(Tsid id) {
         return (PersonResponse) Either.<BusinessException, Tsid>right(id)
-                .flatMap(identifier -> personRepository.findById(identifier.toLong())
-                        .<Either<BusinessException, Person>>map(Either::right)
-                        .orElseGet(() -> Either.left(new BusinessException(PersonConstants.ID_NOT_FOUND))))
-                .flatMap(person -> {
-                    person.deleted();
-                    personRepository.delete(person);
-                    return Either.right(person);
-                })
+                .flatMap(this::findPerson)
+                .flatMap(this::canRemovePerson)
+                .flatMap(this::deletePerson)
                 .map(PersonResponse::fromPerson)
                 .fold(this::throwBusinessException, personResponse -> personResponse);
+    }
+
+    private Either<BusinessException, Person> findPerson(Tsid identifier) {
+        return personRepository.findById(identifier.toLong())
+                .<Either<BusinessException, Person>>map(Either::right)
+                .orElseGet(() -> Either.left(new BusinessException(PersonConstants.ID_NOT_FOUND)));
+    }
+
+    private Either<? extends BusinessException, ? extends Person> deletePerson(Person person) {
+        person.deleted();
+        personRepository.delete(person);
+        return Either.right(person);
+    }
+
+    private Either<? extends BusinessException, Person> canRemovePerson(Person person) {
+        if (organizationProvider.canRemovePerson(Tsid.from(person.getId())))
+            return Either.right(person);
+        return Either.left(new BusinessException(PersonConstants.CANNOT_REMOVE_PERSON_ORGANIZATION));
     }
 }

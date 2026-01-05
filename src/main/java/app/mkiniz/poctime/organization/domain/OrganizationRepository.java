@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
     Optional<Organization> findByPersonId(Long personId);
+
+    boolean existsByPersonIdOrResponsiblePersonId(Long personId, Long responsibleId);
 }
