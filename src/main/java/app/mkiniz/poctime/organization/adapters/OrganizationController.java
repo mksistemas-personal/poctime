@@ -1,6 +1,9 @@
 package app.mkiniz.poctime.organization.adapters;
 
-import app.mkiniz.poctime.organization.domain.*;
+import app.mkiniz.poctime.organization.domain.Organization;
+import app.mkiniz.poctime.organization.domain.OrganizationRequest;
+import app.mkiniz.poctime.organization.domain.OrganizationResponse;
+import app.mkiniz.poctime.organization.domain.UpdateOrganizationRequest;
 import app.mkiniz.poctime.shared.business.*;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
@@ -28,7 +31,6 @@ public class OrganizationController {
     private final DeleteBusinessUseCase<Tsid, OrganizationResponse> deleteOrganizationService;
     private final GetByIdBusinessUseCase<Tsid, OrganizationResponse> getOrganizationByIdService;
     private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationResponse>>> getAllOrganizationService;
-    private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationProjection>>> getAllOrganizationProjectionService;
 
     @PostMapping
     public OrganizationResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
@@ -63,16 +65,4 @@ public class OrganizationController {
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }
 
-    @GetMapping(path = "/flat")
-    public ResponseEntity<Slice<OrganizationProjection>> getAllOrganizationsFlat(
-            @And({
-                    @Spec(path = "responsibleEmail", params = "responsibleEmail", spec = LikeIgnoreCase.class),
-                    @Spec(path = "address.street", params = "street", spec = LikeIgnoreCase.class),
-                    @Spec(path = "address.city", params = "city", spec = LikeIgnoreCase.class),
-                    @Spec(path = "address.stateCode", params = "stateCode", spec = EqualIgnoreCase.class)
-
-            }) Specification<Organization> spec, Pageable pageable) {
-        return getAllOrganizationProjectionService.execute(pageable, spec)
-                .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
-    }
 }

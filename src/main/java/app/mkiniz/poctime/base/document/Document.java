@@ -26,6 +26,7 @@ public interface Document<TIdentifier, TComplement> {
 
     TComplement getComplement();
 
+    @JsonIgnore
     boolean hasComplement();
 
     @JsonIgnore
