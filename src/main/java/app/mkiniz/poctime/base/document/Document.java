@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public interface Document<TIdentifier, TComplement> {
     TIdentifier identifier();
 
+    String getType();
+
     String getCountry();
 
     TComplement getComplement();
