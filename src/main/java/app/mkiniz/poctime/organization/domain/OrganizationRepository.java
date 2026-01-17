@@ -7,8 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface OrganizationRepository extends JpaRepository<Organization, Long>, JpaSpecificationExecutor<Organization> {
+public interface OrganizationRepository extends
+        JpaRepository<Organization, Long>,
+        JpaSpecificationExecutor<Organization>,
+        OrganizationProjectionRepository {
     Optional<Organization> findByPersonId(Long personId);
 
     boolean existsByPersonIdOrResponsiblePersonId(Long personId, Long responsibleId);
+
 }
