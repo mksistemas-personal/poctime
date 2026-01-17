@@ -121,7 +121,7 @@ class AddOrganizationServiceTest {
                     assertThat(response).isNotNull();
                     assertThat(response.organizationId()).isEqualTo(personId);
                     assertThat(response.address()).isEqualTo(address);
-                    assertThat(response.responsibleId()).isEqualTo(responsibleId);
+                    assertThat(response.responsiblePerson().id()).isEqualTo(responsibleId.toLowerCase());
                     assertThat(response.responsibleEmail()).isEqualTo(responsibleEmail);
                     verify(organizationRepository).save(organizationCaptor.capture());
                     assertThat(organizationCaptor.getValue())

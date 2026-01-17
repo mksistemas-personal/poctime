@@ -1,6 +1,7 @@
 package app.mkiniz.poctime.person.services;
 
 import app.mkiniz.poctime.base.document.bra.CpfDocument;
+import app.mkiniz.poctime.organization.OrganizationProvider;
 import app.mkiniz.poctime.person.PersonConstants;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRepository;
@@ -26,12 +27,15 @@ class DeletePersonServiceTest {
     @Mock
     private PersonRepository personRepository;
 
+    @Mock
+    private OrganizationProvider organizationProvider;
+
     private DeleteBaseBusinessTest<Tsid, PersonResponse> baseTest;
     private CpfDocument cpfDocument;
 
     @BeforeEach
     void setUp() {
-        this.baseTest = DeleteBaseBusinessTest.<Tsid, PersonResponse>of();
+        this.baseTest = DeleteBaseBusinessTest.of();
         this.cpfDocument = new CpfDocument("123.456.789-00");
     }
 
@@ -39,13 +43,15 @@ class DeletePersonServiceTest {
     void deletePerfectTest() {
         this.baseTest
                 .given(() -> {
+                    Tsid id = Tsid.from(1L);
                     when(personRepository.findById(anyLong())).thenReturn(
                             Optional.of(
                                     Person.builder().id(1L).name("name-del").document(cpfDocument).build())
                     );
-                    return Tsid.from(1L);
+                    when(organizationProvider.canRemovePerson(id)).thenReturn(true);
+                    return id;
                 })
-                .when(() -> new DeletePersonService(personRepository))
+                .when(() -> new DeletePersonService(personRepository, organizationProvider))
                 .then((tsid, response) -> {
                     assertNotNull(response);
                     assertEquals(tsid.toLowerCase(), response.id());
@@ -53,6 +59,7 @@ class DeletePersonServiceTest {
                     assertEquals(cpfDocument, response.document());
                     verify(personRepository, times(1)).findById(anyLong());
                     verify(personRepository, times(1)).delete(any(Person.class));
+                    verify(organizationProvider, times(1)).canRemovePerson(any());
                 })
                 .execute();
     }
@@ -64,7 +71,7 @@ class DeletePersonServiceTest {
                     when(personRepository.findById(anyLong())).thenReturn(Optional.empty());
                     return Tsid.from(1L);
                 })
-                .when(() -> new DeletePersonService(personRepository))
+                .when(() -> new DeletePersonService(personRepository, organizationProvider))
                 .execute());
         assertNotNull(exception);
         assertEquals(PersonConstants.ID_NOT_FOUND, exception.getMessage());

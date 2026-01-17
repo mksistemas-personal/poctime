@@ -22,6 +22,11 @@ public record CnpjDocument(String identifier) implements Document<String, String
     }
 
     @Override
+    public String getType() {
+        return "cnpj";
+    }
+
+    @Override
     public String getCountry() {
         return CountryConstant.BR;
     }

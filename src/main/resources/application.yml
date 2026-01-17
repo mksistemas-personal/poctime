@@ -1,6 +1,14 @@
 spring:
   application:
     name: poctime
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/poctime-app
+          jwk-set-uri: http://localhost:9090/realms/poctime-app/protocol/openid-connect/certs
+
   datasource:
     url: jdbc:postgresql://localhost:5432/poctime
     username: admin

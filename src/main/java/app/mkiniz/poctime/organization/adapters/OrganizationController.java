@@ -1,9 +1,6 @@
 package app.mkiniz.poctime.organization.adapters;
 
-import app.mkiniz.poctime.organization.domain.Organization;
-import app.mkiniz.poctime.organization.domain.OrganizationRequest;
-import app.mkiniz.poctime.organization.domain.OrganizationResponse;
-import app.mkiniz.poctime.organization.domain.UpdateOrganizationRequest;
+import app.mkiniz.poctime.organization.domain.*;
 import app.mkiniz.poctime.shared.business.*;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
@@ -31,6 +28,7 @@ public class OrganizationController {
     private final DeleteBusinessUseCase<Tsid, OrganizationResponse> deleteOrganizationService;
     private final GetByIdBusinessUseCase<Tsid, OrganizationResponse> getOrganizationByIdService;
     private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationResponse>>> getAllOrganizationService;
+    private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationProjectionResponse>>> getAllOrganizationProjectionService;
 
     @PostMapping
     public OrganizationResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
@@ -64,4 +62,11 @@ public class OrganizationController {
         return getAllOrganizationService.execute(pageable, spec)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }
+
+    @GetMapping(path = "/projection/allWithCity")
+    public ResponseEntity<Slice<OrganizationProjectionResponse>> getAllOrganizationsProjection(Pageable pageable) {
+        return getAllOrganizationProjectionService.execute(pageable, null)
+                .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
+    }
+
 }

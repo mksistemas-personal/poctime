@@ -134,7 +134,7 @@ class UpdateOrganizationServiceTest {
                     assertThat(response).isNotNull();
                     assertThat(response.organizationId()).isEqualTo(personId);
                     assertThat(response.address()).isEqualTo(newAddress);
-                    assertThat(response.responsibleId()).isEqualTo(newResponsibleId);
+                    assertThat(response.responsiblePerson().id()).isEqualTo(newResponsibleId.toLowerCase());
                     assertThat(response.responsibleEmail()).isEqualTo(newResponsibleEmail);
                     verify(organizationRepository, times(1)).findById(id.toLong());
                     verify(personProvider, times(1)).getPerson(newResponsibleId);

@@ -16,6 +16,11 @@ public record CpfDocument(String identifier) implements Document<String, String>
     }
 
     @Override
+    public String getType() {
+        return "cpf";
+    }
+
+    @Override
     public String getCountry() {
         return CountryConstant.BR;
     }
