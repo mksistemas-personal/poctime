@@ -63,7 +63,7 @@ public class OrganizationController {
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }
 
-    @GetMapping(path = "/projection/allWithCity")
+    @GetMapping(path = "/projection/all-with-city")
     public ResponseEntity<Slice<OrganizationProjectionResponse>> getAllOrganizationsProjection(Pageable pageable) {
         return getAllOrganizationProjectionService.execute(pageable, null)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
