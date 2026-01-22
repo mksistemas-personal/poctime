@@ -13,4 +13,12 @@ public record PersonResponse(String id, String name, Document<?, ?> document) {
                 .document(person.getDocument())
                 .build();
     }
+
+    public Person toPerson() {
+        return Person.builder()
+                .id(TsidGenerator.fromStringToLong(id))
+                .name(name)
+                .document(document)
+                .build();
+    }
 }

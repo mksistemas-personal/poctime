@@ -7,6 +7,7 @@ import app.mkiniz.poctime.organization.domain.*;
 import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonKindEnumeration;
+import app.mkiniz.poctime.shared.adapter.TsidGenerator;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import app.mkiniz.poctime.shared.business.UpdateBusinessUseCase;
 import com.github.f4b6a3.tsid.Tsid;
@@ -72,7 +73,12 @@ class UpdateOrganizationService implements UpdateBusinessUseCase<Tsid, UpdateOrg
 
     private Either<? extends BusinessException, ? extends Context> findResponsiblePerson(Context context) {
         if (!context.getRequestResponsiblePersonIdAsLong().equals(context.getResponsiblePersonIdAsLong())) {
-            Optional<Person> responsiblePerson = personProvider.getPerson(context.request.responsiblePersonId());
+
+            Optional<Person> responsiblePerson = context.isResponsiblePersonNew() ?
+                    Optional.of(personProvider.createPerson(
+                            context.request.responsiblePerson().name(),
+                            context.request.responsiblePerson().document())) :
+                    personProvider.getPerson(Tsid.from(context.getRequestResponsiblePersonIdAsLong()));
             if (responsiblePerson.isEmpty())
                 return Either.left(new BusinessException(OrganizationConstants.RESPONSIBLE_PERSON_NOT_FOUND));
             else {
@@ -109,7 +115,11 @@ class UpdateOrganizationService implements UpdateBusinessUseCase<Tsid, UpdateOrg
         }
 
         public Long getRequestResponsiblePersonIdAsLong() {
-            return request.responsiblePersonId().toLong();
+            return TsidGenerator.fromStringToLong(request.responsiblePerson().id());
+        }
+
+        public boolean isResponsiblePersonNew() {
+            return request.responsiblePerson().isNew();
         }
 
         public String getPersonCountry() {

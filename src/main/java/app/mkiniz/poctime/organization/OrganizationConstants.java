@@ -17,6 +17,7 @@ public class OrganizationConstants {
     public static final String ORGANIZATION_RESPONSIBLE_PERSON_COUNTRY_WRONG_TYPE = "organization.responsible.person.country.wrong.type";
     public static final String ORGANIZATION_NOT_FOUND = "organization.not.found";
 
+
     // STREAM CONSTANTS
     public static final String ORGANIZATION_BINDING_NAME = "exchangeOrganization-out-0";
 

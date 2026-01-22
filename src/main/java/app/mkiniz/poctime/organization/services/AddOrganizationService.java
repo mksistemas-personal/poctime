@@ -69,7 +69,11 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     }
 
     private Either<BusinessException, Context> findResponsiblePerson(Context context) {
-        Optional<Person> responsiblePerson = personProvider.getPerson(context.getResponsiblePersonId());
+        Optional<Person> responsiblePerson = context.isNewResponsiblePerson() ?
+                Optional.of(personProvider.createPerson(
+                        context.request.responsiblePerson().name(),
+                        context.request.responsiblePerson().document()))
+                : personProvider.getPerson(context.getResponsiblePersonId());
         responsiblePerson.ifPresent(value -> context.responsiblePerson = value);
         return responsiblePerson.isEmpty() ?
                 Either.left(new BusinessException(OrganizationConstants.RESPONSIBLE_PERSON_NOT_FOUND)) :
@@ -85,7 +89,10 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     }
 
     private Either<BusinessException, Context> findOrganizationPerson(Context context) {
-        Optional<Person> person = personProvider.getPerson(context.getPersonId());
+        Optional<Person> person = context.isNewPerson() ? Optional.of(personProvider.createPerson(
+                context.request.person().name(),
+                context.request.person().document()
+        )) : personProvider.getPerson(context.getPersonId());
         person.ifPresent(value -> context.person = value);
         return person.isEmpty() ?
                 Either.left(new BusinessException(OrganizationConstants.PERSON_NOT_FOUND)) :
@@ -119,12 +126,20 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
             return new Context(request);
         }
 
+        public boolean isNewPerson() {
+            return request.person().isNew();
+        }
+
+        public boolean isNewResponsiblePerson() {
+            return request.responsiblePerson().isNew();
+        }
+
         public Long getPersonIdAsLong() {
-            return request.personId().toLong();
+            return TsidGenerator.fromStringToLong(request.person().id());
         }
 
         public Tsid getPersonId() {
-            return request.personId();
+            return Tsid.from(request.person().id());
         }
 
         public String getPersonCountry() {
@@ -136,7 +151,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
         }
 
         public Tsid getResponsiblePersonId() {
-            return request.responsiblePersonId();
+            return Tsid.from(request.responsiblePerson().id());
         }
 
         public String getResponsibleEmail() {
