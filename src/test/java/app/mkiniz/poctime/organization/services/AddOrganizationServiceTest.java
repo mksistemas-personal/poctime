@@ -59,6 +59,8 @@ class AddOrganizationServiceTest {
     private Person person;
     private Person responsiblePerson;
     private Organization organization;
+    private PersonRequest personRequest;
+    private PersonRequest personResponsibleRequest;
 
     @BeforeEach
     void setUp() {
@@ -97,15 +99,22 @@ class AddOrganizationServiceTest {
                 .responsibleEmail(responsibleEmail)
                 .person(person)
                 .build();
+        this.personRequest = PersonRequest.builder()
+                .name("John Doe")
+                .document(new CnpjDocument("45335153000134"))
+                .build();
+        this.personResponsibleRequest = PersonRequest.builder()
+                .name("Mary Who")
+                .document(new CpfDocument("45212890052"))
+                .build();
     }
 
     @Test
     void addOrganizationPerfectTest() {
         this.baseTest
                 .given(() -> {
-                    when(personProvider.getPerson(personId)).thenReturn(Optional.of(person));
-                    when(personProvider.getPerson(responsibleId)).thenReturn(Optional.of(responsiblePerson));
-                    when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.empty());
+                    when(personProvider.createPerson(anyString(), any(CnpjDocument.class))).thenReturn(person);
+                    when(personProvider.createPerson(anyString(), any(CpfDocument.class))).thenReturn(responsiblePerson);
                     when(organizationRepository.save(any(Organization.class)))
                             .thenAnswer(invocation -> {
                                 Organization org = invocation.getArgument(0);
@@ -114,7 +123,7 @@ class AddOrganizationServiceTest {
                             });
                     when(beanFactory.getBean("address-br", AddressCountry.class)).thenReturn(new BrazilianAddress());
                     when(beanFactory.getBean("organization-country-br", OrganizationCountryValidation.class)).thenReturn(new BrazilianOrganizationCountryValidation());
-                    return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
+                    return new OrganizationRequest(personRequest, address, personResponsibleRequest, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
                 .then((request, response) -> {
@@ -128,9 +137,8 @@ class AddOrganizationServiceTest {
                             .usingRecursiveComparison()
                             .ignoringFields("domainEvents")
                             .isEqualTo(organization);
-                    verify(organizationRepository, times(1)).findByPersonId(personId.toLong());
-                    verify(personProvider, times(1)).getPerson(personId);
-                    verify(personProvider, times(1)).getPerson(responsibleId);
+                    verify(personProvider, times(1)).createPerson(anyString(), any(CnpjDocument.class));
+                    verify(personProvider, times(1)).createPerson(anyString(), any(CpfDocument.class));
                     verify(beanFactory, times(1)).getBean("address-br", AddressCountry.class);
                     verify(beanFactory, times(1)).getBean("organization-country-br", OrganizationCountryValidation.class);
                     verify(organizationRepository, times(1)).save(any(Organization.class));
@@ -143,7 +151,8 @@ class AddOrganizationServiceTest {
         BusinessException exception = assertThrows(BusinessException.class, () -> this.baseTest
                 .given(() -> {
                     when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.of(organization));
-                    return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
+                    personRequest = personRequest.withId(personId.toLowerCase());
+                    return new OrganizationRequest(personRequest, address, personResponsibleRequest, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
                 .then((request, response) -> fail())
@@ -156,9 +165,15 @@ class AddOrganizationServiceTest {
     void addOrganizationWithNoPersonTest() {
         BusinessException exception = assertThrows(BusinessException.class, () -> this.baseTest
                 .given(() -> {
+                    personRequest = PersonRequest
+                            .builder()
+                            .id(personId.toLowerCase())
+                            .name("John Doe")
+                            .document(new CnpjDocument("45335153000134"))
+                            .build();
                     when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.empty());
                     when(personProvider.getPerson(personId)).thenReturn(Optional.empty());
-                    return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
+                    return new OrganizationRequest(personRequest, address, personResponsibleRequest, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
                 .then((request, response) -> fail())
@@ -171,11 +186,22 @@ class AddOrganizationServiceTest {
     void addOrganizationWithNoResponsiblePersonTest() {
         BusinessException exception = assertThrows(BusinessException.class, () -> this.baseTest
                 .given(() -> {
+                    personRequest = PersonRequest
+                            .builder()
+                            .id(personId.toLowerCase())
+                            .name("John Doe")
+                            .document(new CnpjDocument("45335153000134"))
+                            .build();
+                    personResponsibleRequest = PersonRequest.builder()
+                            .id(responsibleId.toLowerCase())
+                            .name("Mary Who")
+                            .document(new CnpjDocument("45212890052"))
+                            .build();
                     when(organizationRepository.findByPersonId(anyLong())).thenReturn(Optional.empty());
                     when(personProvider.getPerson(personId)).thenReturn(Optional.of(person));
                     when(personProvider.getPerson(responsibleId)).thenReturn(Optional.empty());
                     when(beanFactory.getBean("address-br", AddressCountry.class)).thenReturn(new BrazilianAddress());
-                    return new OrganizationRequest(personId, address, responsibleId, responsibleEmail);
+                    return new OrganizationRequest(personRequest, address, personResponsibleRequest, responsibleEmail);
                 })
                 .when(request -> addOrganizationService.execute(request))
                 .then((request, response) -> fail())

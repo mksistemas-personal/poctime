@@ -104,6 +104,8 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     }
 
     Either<BusinessException, Context> findOrganization(Context context) {
+        if (context.isNewPerson())
+            return Either.right(context);
         Optional<Organization> org = organizationRepository.findByPersonId(context.getPersonIdAsLong());
         return org.isEmpty() ?
                 Either.right(context) :
