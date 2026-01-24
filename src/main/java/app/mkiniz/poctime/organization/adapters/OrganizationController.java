@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping(path = "/api/organization")
 @AllArgsConstructor
@@ -28,7 +30,7 @@ public class OrganizationController {
     private final DeleteBusinessUseCase<Tsid, OrganizationResponse> deleteOrganizationService;
     private final GetByIdBusinessUseCase<Tsid, OrganizationResponse> getOrganizationByIdService;
     private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationResponse>>> getAllOrganizationService;
-    private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationProjectionResponse>>> getAllOrganizationProjectionService;
+    private final GetAllBusinessUseCase<String, Maybe<Slice<OrganizationProjectionResponse>>> getAllOrganizationProjectionService;
 
     @PostMapping
     public OrganizationResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
@@ -64,8 +66,11 @@ public class OrganizationController {
     }
 
     @GetMapping(path = "/projection/all-with-city")
-    public ResponseEntity<Slice<OrganizationProjectionResponse>> getAllOrganizationsProjection(Pageable pageable) {
-        return getAllOrganizationProjectionService.execute(pageable, null)
+    public ResponseEntity<Slice<OrganizationProjectionResponse>> getAllOrganizationsProjection(
+            @RequestParam(name = "documentType", required = false) String docType,
+            Pageable pageable) {
+        String documentType = Objects.nonNull(docType) ? docType.toLowerCase() : null;
+        return getAllOrganizationProjectionService.execute(pageable, documentType)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }
 

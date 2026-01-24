@@ -30,5 +30,6 @@ public interface Document<TIdentifier, TComplement> {
     @JsonIgnore
     boolean isValid();
 
+    @JsonIgnore
     String getType();
 }
