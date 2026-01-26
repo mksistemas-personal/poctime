@@ -1,11 +1,11 @@
-package app.mkiniz.poctime.base.address;
+package app.mkiniz.poctime.base.federalstates.brazil;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public enum BrasilFederativeUnit {
+public enum BrazilFederativeUnit {
     AC("Acre"),
     AL("Alagoas"),
     AP("Amapa"),
@@ -36,7 +36,7 @@ public enum BrasilFederativeUnit {
 
     private final String name;
 
-    BrasilFederativeUnit(String name) {
+    BrazilFederativeUnit(String name) {
         this.name = name;
     }
 
@@ -47,29 +47,29 @@ public enum BrasilFederativeUnit {
     /**
      * Retorna uma lista com todas as UFs (objetos Enum)
      */
-    public static List<BrasilFederativeUnit> getAll() {
-        return Arrays.asList(BrasilFederativeUnit.values());
+    public static List<BrazilFederativeUnit> getAll() {
+        return Arrays.asList(BrazilFederativeUnit.values());
     }
 
     /**
      * Retorna apenas as siglas como String
      */
     public static List<String> getAllCodes() {
-        return Arrays.stream(BrasilFederativeUnit.values())
-                .map(BrasilFederativeUnit::name)
+        return Arrays.stream(BrazilFederativeUnit.values())
+                .map(BrazilFederativeUnit::name)
                 .collect(Collectors.toList());
     }
 
-    public static Optional<BrasilFederativeUnit> fromStateCode(String stateCode) {
+    public static Optional<BrazilFederativeUnit> fromStateCode(String stateCode) {
         try {
-            return Optional.of(BrasilFederativeUnit.valueOf(stateCode.toUpperCase()));
+            return Optional.of(BrazilFederativeUnit.valueOf(stateCode.toUpperCase()));
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
     }
 
-    public static Optional<BrasilFederativeUnit> fromState(String state) {
-        return Arrays.stream(BrasilFederativeUnit.values())
+    public static Optional<BrazilFederativeUnit> fromState(String state) {
+        return Arrays.stream(BrazilFederativeUnit.values())
                 .filter(f -> f.name.equalsIgnoreCase(state))
                 .findFirst();
     }

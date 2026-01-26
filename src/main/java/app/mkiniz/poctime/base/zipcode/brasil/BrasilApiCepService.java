@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.base.zipcode.brasil;
 
+import app.mkiniz.poctime.base.zipcode.ZipCodeResponse;
 import app.mkiniz.poctime.base.zipcode.ZipCodeUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.Optional;
 
-@Service
+@Service("zipcode-br")
 public class BrasilApiCepService implements ZipCodeUseCase {
 
     private final RestClient restClient;
@@ -18,12 +19,13 @@ public class BrasilApiCepService implements ZipCodeUseCase {
     }
 
     @Override
-    public Optional<CepResponse> findByCep(String cep) {
+    public Optional<ZipCodeResponse> findByCep(String cep) {
         try {
             return Optional.ofNullable(restClient.get()
-                    .uri("/{cep}", cep)
-                    .retrieve()
-                    .body(CepResponse.class));
+                            .uri("/{cep}", cep)
+                            .retrieve()
+                            .body(CepResponse.class))
+                    .map(CepResponse::toZipCode);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return Optional.empty();

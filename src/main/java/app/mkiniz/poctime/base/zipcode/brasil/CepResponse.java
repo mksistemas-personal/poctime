@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.base.zipcode.brasil;
 
+import app.mkiniz.poctime.base.zipcode.ZipCodeResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -15,4 +16,7 @@ public record CepResponse(
         String street,
         String service
 ) {
+    public ZipCodeResponse toZipCode() {
+        return new ZipCodeResponse(cep(), state(), city(), neighborhood(), street(), service());
+    }
 }

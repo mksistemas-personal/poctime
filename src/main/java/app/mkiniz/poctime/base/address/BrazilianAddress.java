@@ -1,6 +1,7 @@
 package app.mkiniz.poctime.base.address;
 
 import app.mkiniz.poctime.base.CountryConstant;
+import app.mkiniz.poctime.base.federalstates.brazil.BrazilFederativeUnit;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import cyclops.control.Either;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ public class BrazilianAddress implements AddressCountry {
                         Either.left(new BusinessException(STATE_CODE_REQUIRED)))
                 .flatMap(this::validateStateCode)
                 .flatMap(address -> StringUtils.hasText(address.state()) &&
-                        BrasilFederativeUnit.fromState(address.state()).isEmpty() ?
+                        BrazilFederativeUnit.fromState(address.state()).isEmpty() ?
                         Either.left(new BusinessException(STATE_INVALID)) :
                         Either.right(address))
                 .flatMap(address -> StringUtils.hasText(address.country()) ?
@@ -49,7 +50,7 @@ public class BrazilianAddress implements AddressCountry {
 
     private Either<BusinessException, Address> validateStateCode(Address address) {
         if (StringUtils.hasText(address.stateCode())) {
-            Optional<BrasilFederativeUnit> federalUnit = BrasilFederativeUnit.fromStateCode(address.stateCode());
+            Optional<BrazilFederativeUnit> federalUnit = BrazilFederativeUnit.fromStateCode(address.stateCode());
             if (federalUnit.isEmpty())
                 return Either.left(new BusinessException(AddressCountry.STATE_CODE_INVALID));
             if (StringUtils.hasText(address.state()) &&
