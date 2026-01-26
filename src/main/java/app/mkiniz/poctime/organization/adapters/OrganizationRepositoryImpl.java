@@ -11,6 +11,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 class OrganizationRepositoryImpl implements OrganizationProjectionRepository {
@@ -20,7 +21,7 @@ class OrganizationRepositoryImpl implements OrganizationProjectionRepository {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Slice<OrganizationProjectionResponse> findAllProjections(Pageable pageable) {
+    public Slice<OrganizationProjectionResponse> findAllProjections(Pageable pageable, String documentType) {
         String sql = """
                 select
                     o.id,
@@ -30,20 +31,23 @@ class OrganizationRepositoryImpl implements OrganizationProjectionRepository {
                     o.city,
                     p.id as person_id
                 from
-                    organization o inner join 
-                        person p on o.person_id = p.id
+                    person p left join
+                    organization o on p.id = o.person_id
                 where
-                   o.deleted = false
+                    p.deleted = false and 
+                    (o.id is null or o.deleted = false) and 
+                    (cast(:documentType as varchar) is null or p.document->>'type' = :documentType)
                 """;
 
         List<Object[]> results = entityManager.createNativeQuery(sql)
                 .setFirstResult((int) pageable.getOffset())
                 .setMaxResults(pageable.getPageSize() + 1)
+                .setParameter("documentType", documentType)
                 .getResultList();
 
         List<OrganizationProjectionResponse> elements = results.stream()
                 .map(row -> new OrganizationProjectionResponse(
-                        Tsid.from((Long) row[0]).toLowerCase(),
+                        Objects.isNull(row[0]) ? null : Tsid.from((Long) row[0]).toLowerCase(),
                         Tsid.from((Long) row[5]).toLowerCase(),
                         (String) row[1],
                         (String) row[2],

@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public interface Document<TIdentifier, TComplement> {
     TIdentifier identifier();
 
-    String getType();
-
     String getCountry();
 
     TComplement getComplement();
@@ -31,4 +29,7 @@ public interface Document<TIdentifier, TComplement> {
 
     @JsonIgnore
     boolean isValid();
+
+    @JsonIgnore
+    String getType();
 }

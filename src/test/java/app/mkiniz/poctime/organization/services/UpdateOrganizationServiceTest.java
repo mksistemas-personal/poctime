@@ -60,6 +60,8 @@ class UpdateOrganizationServiceTest {
     private String newResponsibleEmail;
     private Tsid newResponsibleId;
     private Person newResponsiblePerson;
+    private PersonRequest personRequest;
+    private PersonRequest personResponsibleRequest;
 
     @BeforeEach
     void setUp() {
@@ -117,6 +119,15 @@ class UpdateOrganizationServiceTest {
                 .name("Mary Who 2")
                 .document(new CpfDocument("56877367006"))
                 .build();
+        this.personRequest = PersonRequest.builder()
+                .name("John Doe")
+                .document(new CnpjDocument("45335153000134"))
+                .build();
+        this.personResponsibleRequest = PersonRequest.builder()
+                .id(newResponsibleId.toLowerCase())
+                .name("Mary Who")
+                .document(new CnpjDocument("45212890052"))
+                .build();
     }
 
     @Test
@@ -127,7 +138,7 @@ class UpdateOrganizationServiceTest {
                     when(personProvider.getPerson(newResponsibleId)).thenReturn(Optional.of(newResponsiblePerson));
                     when(beanFactory.getBean("address-br", AddressCountry.class)).thenReturn(new BrazilianAddress());
                     when(beanFactory.getBean("organization-country-br", OrganizationCountryValidation.class)).thenReturn(new BrazilianOrganizationCountryValidation());
-                    return new UpdateOrganizationRequest(newAddress, newResponsibleId, newResponsibleEmail);
+                    return new UpdateOrganizationRequest(newAddress, personResponsibleRequest, newResponsibleEmail);
                 })
                 .when((id, request) -> updateOrganizationService.execute(id, request))
                 .then((id, request, response) -> {
