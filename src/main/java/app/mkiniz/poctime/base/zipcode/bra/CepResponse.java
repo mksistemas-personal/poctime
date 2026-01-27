@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.base.zipcode.brasil;
+package app.mkiniz.poctime.base.zipcode.bra;
 
 import app.mkiniz.poctime.base.zipcode.ZipCodeResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

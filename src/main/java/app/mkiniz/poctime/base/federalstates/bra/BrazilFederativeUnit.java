@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.base.federalstates.brazil;
+package app.mkiniz.poctime.base.federalstates.bra;
 
 import java.util.Arrays;
 import java.util.List;

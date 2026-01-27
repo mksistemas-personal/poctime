@@ -1,7 +1,7 @@
 package app.mkiniz.poctime.base.address;
 
 import app.mkiniz.poctime.base.CountryConstant;
-import app.mkiniz.poctime.base.federalstates.brazil.BrazilFederativeUnit;
+import app.mkiniz.poctime.base.federalstates.bra.BrazilFederativeUnit;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import cyclops.control.Either;
 import org.springframework.stereotype.Component;

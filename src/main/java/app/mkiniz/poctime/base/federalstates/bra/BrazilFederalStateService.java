@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.base.federalstates.brazil;
+package app.mkiniz.poctime.base.federalstates.bra;
 
 import app.mkiniz.poctime.base.federalstates.FederalStateUseCase;
 import org.springframework.stereotype.Component;
