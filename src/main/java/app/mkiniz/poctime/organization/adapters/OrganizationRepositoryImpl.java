@@ -24,17 +24,11 @@ class OrganizationRepositoryImpl implements OrganizationProjectionRepository {
     public Slice<OrganizationProjectionResponse> findAllProjections(Pageable pageable, String documentType) {
         String sql = """
                 select
-                    case
-                        when o.deleted then null
-                        else o.id
-                    end as organization_id,
+                    o.id,
                     p.name,
                     p.document->>'type' as type,
                     p.document->>'identifier' as identifier,
-                    case
-                        when o.deleted then null
-                        else o.city
-                    end as organization_city,
+                    o.city,
                     p.id as person_id
                 from
                     person p left join
