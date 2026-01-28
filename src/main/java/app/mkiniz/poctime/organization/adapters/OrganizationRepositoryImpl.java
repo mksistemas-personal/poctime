@@ -38,7 +38,7 @@ class OrganizationRepositoryImpl implements OrganizationProjectionRepository {
                     p.id as person_id
                 from
                     person p left join
-                    organization o on p.id = o.person_id
+                    organization o on p.id = o.person_id and o.deleted = false
                 where
                     p.deleted = false and
                     (cast(:documentType as varchar) is null or p.document->>'type' = :documentType)
