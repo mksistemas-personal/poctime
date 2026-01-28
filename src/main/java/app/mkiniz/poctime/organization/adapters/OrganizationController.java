@@ -55,6 +55,8 @@ public class OrganizationController {
     @GetMapping
     public ResponseEntity<Slice<OrganizationResponse>> getAllOrganizations(
             @And({
+                    @Spec(path = "person.name", params = "name", spec = LikeIgnoreCase.class),
+                    @Spec(path = "responsiblePerson.name", params = "respName", spec = LikeIgnoreCase.class),
                     @Spec(path = "responsibleEmail", params = "responsibleEmail", spec = LikeIgnoreCase.class),
                     @Spec(path = "address.street", params = "street", spec = LikeIgnoreCase.class),
                     @Spec(path = "address.city", params = "city", spec = LikeIgnoreCase.class),

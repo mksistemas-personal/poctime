@@ -24,18 +24,23 @@ class OrganizationRepositoryImpl implements OrganizationProjectionRepository {
     public Slice<OrganizationProjectionResponse> findAllProjections(Pageable pageable, String documentType) {
         String sql = """
                 select
-                    o.id,
+                    case
+                        when o.deleted then null
+                        else o.id
+                    end as organization_id,
                     p.name,
                     p.document->>'type' as type,
                     p.document->>'identifier' as identifier,
-                    o.city,
+                    case
+                        when o.deleted then null
+                        else o.city
+                    end as organization_city,
                     p.id as person_id
                 from
                     person p left join
                     organization o on p.id = o.person_id
                 where
-                    p.deleted = false and 
-                    (o.id is null or o.deleted = false) and 
+                    p.deleted = false and
                     (cast(:documentType as varchar) is null or p.document->>'type' = :documentType)
                 """;
 
