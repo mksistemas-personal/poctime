@@ -1,6 +1,7 @@
 package app.mkiniz.poctime.organization.domain;
 
 import app.mkiniz.poctime.base.address.Address;
+import app.mkiniz.poctime.economicgroup.domain.EconomicGroup;
 import app.mkiniz.poctime.organization.OrganizationConstants;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.business.BusinessException;
@@ -16,7 +17,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "organization")
@@ -27,7 +30,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE organization SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
-public class Organization extends AbstractAggregateRoot<Person> implements EntityCreated, EntityUpdated, EntityDeleted {
+public class Organization extends AbstractAggregateRoot<Organization> implements EntityCreated, EntityUpdated, EntityDeleted {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
@@ -36,6 +39,10 @@ public class Organization extends AbstractAggregateRoot<Person> implements Entit
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", foreignKey = @ForeignKey(name = "fk_organization_person"))
     private Person person;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "organizations")
+    @Builder.Default
+    private Set<EconomicGroup> economicGroups = new HashSet<>();
 
     @Embedded
     private Address address;
