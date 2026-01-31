@@ -26,7 +26,7 @@ class GetOrganizationsNoFoundInListService implements GetOrganizationsNoFoundInL
                 .map(TsidGenerator::fromStringToLong)
                 .toList();
 
-        return organizationRepository.findIdsByNotInList(longIds).stream()
+        return organizationRepository.findIdsByNotInList(longIds.toArray(new Long[0])).stream()
                 .map(TsidGenerator::fromLongToString)
                 .toList();
     }

@@ -29,7 +29,9 @@ public interface OrganizationRepository extends
     @EntityGraph(attributePaths = {"person", "responsiblePerson"})
     Page<Organization> findAll(Pageable pageable);
 
-    @Query(value = "SELECT id FROM organization WHERE id NOT IN (:ids) AND deleted = false", nativeQuery = true)
-    List<Long> findIdsByNotInList(@Param("ids") List<Long> ids);
+    @Query(value = """
+            SELECT input_id FROM unnest(cast(:ids as bigint[])) as input_id WHERE NOT EXISTS (SELECT 1 FROM organization o WHERE o.id = input_id AND o.deleted = false)
+            """, nativeQuery = true)
+    List<Long> findIdsByNotInList(@Param("ids") Long[] ids);
 
 }

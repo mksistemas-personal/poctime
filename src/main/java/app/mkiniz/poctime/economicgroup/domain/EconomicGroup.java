@@ -1,16 +1,24 @@
 package app.mkiniz.poctime.economicgroup.domain;
 
-import app.mkiniz.poctime.organization.domain.Organization;
+import app.mkiniz.poctime.economicgroup.EconomicGroupConstants;
+import app.mkiniz.poctime.shared.business.BusinessException;
 import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
-import jakarta.persistence.*;
+import cyclops.control.Either;
+import cyclops.control.Try;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -32,17 +40,25 @@ public class EconomicGroup extends AbstractAggregateRoot<EconomicGroup> implemen
 
     private String description;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "economic_group_organization",
-            joinColumns = @JoinColumn(name = "economic_group_id"),
-            inverseJoinColumns = @JoinColumn(name = "organization_id")
-    )
-    @Builder.Default
-    private Set<Organization> organizations = new HashSet<>();
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "\"organization-ids\"", columnDefinition = "jsonb", nullable = false)
+    private Set<String> organizationIds;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
+
+    @Generated
+    @Column(name = "search_vector", columnDefinition = "tsvector", insertable = false, updatable = false)
+    private Object searchVector;
+
+    public Either<BusinessException, EconomicGroup> valid() {
+        return Try.withCatch(() -> {
+                    Objects.requireNonNull(name, EconomicGroupConstants.NAME_NOT_BLANK);
+                    return this;
+                }, NullPointerException.class)
+                .toEither()
+                .mapLeft(e -> new BusinessException(e.getMessage()));
+    }
 
     @Override
     public void created() {

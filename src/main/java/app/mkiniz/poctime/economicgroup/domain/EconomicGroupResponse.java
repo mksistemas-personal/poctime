@@ -13,9 +13,7 @@ public record EconomicGroupResponse(String id, String name, String description, 
                 .id(TsidGenerator.fromLongToString(economicGroup.getId()))
                 .name(economicGroup.getName())
                 .description(economicGroup.getDescription())
-                .organizationIds(economicGroup.getOrganizations().stream()
-                        .map(org -> TsidGenerator.fromLongToString(org.getId()))
-                        .toList())
+                .organizationIds(economicGroup.getOrganizationIds().stream().toList())
                 .build();
     }
 
