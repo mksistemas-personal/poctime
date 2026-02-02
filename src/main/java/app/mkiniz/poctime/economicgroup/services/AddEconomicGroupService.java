@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 
 @Service
 @Transactional
 @AllArgsConstructor
-class AddEconomicGroupService implements AddBusinessUseCase<EconomicGroupRequest, EconomicGroupResponse> {
+class AddEconomicGroupService implements
+        AddBusinessUseCase<EconomicGroupRequest, EconomicGroupResponse>,
+        CommonEconomicGroupService {
 
     private final EconomicGroupRepository economicGroupRepository;
     private final OrganizationProvider organizationProvider;
@@ -58,13 +59,9 @@ class AddEconomicGroupService implements AddBusinessUseCase<EconomicGroupRequest
     }
 
     private Either<? extends BusinessException, Context> validateOrganizations(Context context) {
-        List<String> response = organizationProvider.getOrganizationsNotFound(context.request.organizationIds());
-        if (response.isEmpty()) {
-            return Either.right(context);
-        }
-        String responseAgregateList = String.join(",", response);
-        String exceptionMessage = String.format(EconomicGroupConstants.ORGANIZATIONS_NOT_FOUND, responseAgregateList);
-        return Either.left(new BusinessException(exceptionMessage));
+        return validateOrganizations(organizationProvider, context.request.organizationIds())
+                .<Either<? extends BusinessException, Context>>map(Either::left)
+                .orElse(Either.right(context));
     }
 
     private Either<? extends BusinessException, Context> checkForDuplicatedEconomicGroup(Context context) {

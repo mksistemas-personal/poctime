@@ -13,6 +13,7 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +39,10 @@ public class OrganizationController {
     }
 
     @PutMapping(path = "/{id}")
-    public OrganizationResponse updateOrganization(@PathVariable Tsid id, @Valid @RequestBody UpdateOrganizationRequest request) {
-        return updateOrganizationService.execute(id, request);
+    public ResponseEntity<OrganizationResponse> updateOrganization(@PathVariable Tsid id, @Valid @RequestBody UpdateOrganizationRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(updateOrganizationService.execute(id, request));
     }
 
     @DeleteMapping(path = "/{id}")
