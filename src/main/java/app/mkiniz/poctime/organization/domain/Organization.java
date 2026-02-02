@@ -74,12 +74,22 @@ public class Organization extends AbstractAggregateRoot<Organization> implements
 
     @Override
     public void deleted() {
-
+        this.registerEvent(OrganizationDeletedEvent.builder()
+                .organizationId(Tsid.from(this.person.getId()))
+                .responsibleId(Tsid.from(responsiblePerson.getId()))
+                .responsibleEmail(responsibleEmail)
+                .address(address)
+                .build());
     }
 
     @Override
     public void updated() {
-
+        this.registerEvent(OrganizationUpdatedEvent.builder()
+                .organizationId(Tsid.from(this.person.getId()))
+                .responsibleId(Tsid.from(responsiblePerson.getId()))
+                .responsibleEmail(responsibleEmail)
+                .address(address)
+                .build());
     }
 
     public boolean isPersonAndResponsibleSameCountry() {

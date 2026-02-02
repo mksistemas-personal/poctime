@@ -7,6 +7,7 @@ import app.mkiniz.poctime.economicgroup.domain.EconomicGroupResponse;
 import app.mkiniz.poctime.organization.OrganizationProvider;
 import app.mkiniz.poctime.shared.UpdateBaseBusinessTest;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
+import com.github.f4b6a3.tsid.Tsid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +32,7 @@ class UpdateEconomicGroupServiceTest {
     @Mock
     private OrganizationProvider organizationProvider;
 
-    private UpdateBaseBusinessTest<String, EconomicGroupRequest, EconomicGroupResponse> baseTest;
+    private UpdateBaseBusinessTest<Tsid, EconomicGroupRequest, EconomicGroupResponse> baseTest;
 
     @InjectMocks
     private UpdateEconomicGroupService service;
@@ -55,8 +56,6 @@ class UpdateEconomicGroupServiceTest {
                 .description("Test Description Updated")
                 .organizationIds(Set.of("0PB1TNFCV3DAA", "0PB1TQ7C33CAA"))
                 .build();
-
-
     }
 
     @Test
@@ -67,7 +66,7 @@ class UpdateEconomicGroupServiceTest {
                     when(economicGroupRepository.findById(anyLong())).thenReturn(Optional.of(economicGroup));
                     when(economicGroupRepository.existsByName(anyString())).thenReturn(false);
                     return EconomicGroupRequest.builder()
-                            .id(TsidGenerator.fromLongToString(economicGroup.getId()))
+                            .id(Tsid.from(economicGroup.getId()))
                             .name("Test Economic Group Updated")
                             .description("Test Description Updated")
                             .organizationIds(List.of("0PB1TNFCV3DAA", "0PB1TQ7C33CAA"))
@@ -96,7 +95,7 @@ class UpdateEconomicGroupServiceTest {
                     verify(economicGroupRepository, times(1)).findById(anyLong());
                     verify(economicGroupRepository, times(1)).existsByName(anyString());
                 })
-                .execute(TsidGenerator.fromLongToString(economicGroup.getId()));
+                .execute(Tsid.from(economicGroup.getId()));
     }
 
 }

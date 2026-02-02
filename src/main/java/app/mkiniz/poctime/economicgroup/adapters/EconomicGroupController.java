@@ -4,6 +4,7 @@ import app.mkiniz.poctime.economicgroup.domain.EconomicGroupRequest;
 import app.mkiniz.poctime.economicgroup.domain.EconomicGroupResponse;
 import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import app.mkiniz.poctime.shared.business.UpdateBusinessUseCase;
+import com.github.f4b6a3.tsid.Tsid;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class EconomicGroupController {
 
     private final AddBusinessUseCase<EconomicGroupRequest, EconomicGroupResponse> addEconomicGroupService;
-    private final UpdateBusinessUseCase<String, EconomicGroupRequest, EconomicGroupResponse> updateEconomicGroupService;
+    private final UpdateBusinessUseCase<Tsid, EconomicGroupRequest, EconomicGroupResponse> updateEconomicGroupService;
 
     @PostMapping
     public ResponseEntity<EconomicGroupResponse> createEconomicGroup(@Valid @RequestBody EconomicGroupRequest request) {
@@ -28,7 +29,7 @@ public class EconomicGroupController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<EconomicGroupResponse> updateEconomicGroup(@PathVariable String id,
+    public ResponseEntity<EconomicGroupResponse> updateEconomicGroup(@PathVariable Tsid id,
                                                                      @Valid @RequestBody EconomicGroupRequest request) {
         return ResponseEntity
                 .status(HttpStatus.OK)

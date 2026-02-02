@@ -6,9 +6,9 @@ import app.mkiniz.poctime.economicgroup.domain.EconomicGroupRepository;
 import app.mkiniz.poctime.economicgroup.domain.EconomicGroupRequest;
 import app.mkiniz.poctime.economicgroup.domain.EconomicGroupResponse;
 import app.mkiniz.poctime.organization.OrganizationProvider;
-import app.mkiniz.poctime.shared.adapter.TsidGenerator;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import app.mkiniz.poctime.shared.business.UpdateBusinessUseCase;
+import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Either;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -23,14 +23,14 @@ import java.util.Optional;
 @Transactional
 @AllArgsConstructor
 class UpdateEconomicGroupService implements
-        UpdateBusinessUseCase<String, EconomicGroupRequest, EconomicGroupResponse>,
+        UpdateBusinessUseCase<Tsid, EconomicGroupRequest, EconomicGroupResponse>,
         CommonEconomicGroupService {
 
     private final EconomicGroupRepository economicGroupRepository;
     private final OrganizationProvider organizationProvider;
 
     @Override
-    public EconomicGroupResponse execute(String id, EconomicGroupRequest economicGroupRequest) {
+    public EconomicGroupResponse execute(Tsid id, EconomicGroupRequest economicGroupRequest) {
         return (EconomicGroupResponse) Either.<BusinessException, Context>right(new Context(id, economicGroupRequest))
                 .flatMap(this::findEconomicGroup)
                 .flatMap(this::verifyDuplicatedName)
@@ -66,8 +66,7 @@ class UpdateEconomicGroupService implements
     }
 
     private Either<? extends BusinessException, ? extends Context> findEconomicGroup(Context context) {
-        Long economicGroupId = TsidGenerator.fromStringToLong(context.id);
-        Optional<EconomicGroup> economicGroup = economicGroupRepository.findById(economicGroupId);
+        Optional<EconomicGroup> economicGroup = economicGroupRepository.findById(context.id.toLong());
         economicGroup.ifPresent(value -> context.economicGroup = value);
         return economicGroup.isPresent() ?
                 Either.right(context) :
@@ -75,12 +74,13 @@ class UpdateEconomicGroupService implements
     }
 
     private static class Context {
-        public Context(String id, EconomicGroupRequest request) {
+        public Tsid id;
+
+        public Context(Tsid id, EconomicGroupRequest request) {
             this.id = id;
             this.request = request;
         }
 
-        public String id;
         public EconomicGroupRequest request;
         public EconomicGroup economicGroup;
 
