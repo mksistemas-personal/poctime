@@ -64,14 +64,32 @@ public class EconomicGroup extends AbstractAggregateRoot<EconomicGroup> implemen
 
     @Override
     public void created() {
+        this.registerEvent(EconomicGroupAddedEvent.builder()
+                .id(this.getId().toString())
+                .name(this.getName())
+                .description(this.getDescription())
+                .organizationIds(this.getOrganizationIds().stream().toList())
+                .build());
     }
 
     @Override
     public void deleted() {
+        this.registerEvent(EconomicGroupDeletedEvent.builder()
+                        .id(this.getId().toString())
+                        .name(this.getName())
+                        .description(this.getDescription())
+                        .organizationIds(this.getOrganizationIds().stream().toList()))
+                .build();
     }
 
     @Override
     public void updated() {
+        this.registerEvent(EconomicGroupUpdatedEvent.builder()
+                        .id(this.getId().toString())
+                        .name(this.getName())
+                        .description(this.getDescription())
+                        .organizationIds(this.getOrganizationIds().stream().toList()))
+                .build();
     }
 
 }
