@@ -27,7 +27,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE organization SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
-public class Organization extends AbstractAggregateRoot<Person> implements EntityCreated, EntityUpdated, EntityDeleted {
+public class Organization extends AbstractAggregateRoot<Organization> implements EntityCreated, EntityUpdated, EntityDeleted {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
@@ -74,12 +74,22 @@ public class Organization extends AbstractAggregateRoot<Person> implements Entit
 
     @Override
     public void deleted() {
-
+        this.registerEvent(OrganizationDeletedEvent.builder()
+                .organizationId(Tsid.from(this.person.getId()))
+                .responsibleId(Tsid.from(responsiblePerson.getId()))
+                .responsibleEmail(responsibleEmail)
+                .address(address)
+                .build());
     }
 
     @Override
     public void updated() {
-
+        this.registerEvent(OrganizationUpdatedEvent.builder()
+                .organizationId(Tsid.from(this.person.getId()))
+                .responsibleId(Tsid.from(responsiblePerson.getId()))
+                .responsibleEmail(responsibleEmail)
+                .address(address)
+                .build());
     }
 
     public boolean isPersonAndResponsibleSameCountry() {

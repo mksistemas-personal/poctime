@@ -1,0 +1,19 @@
+package app.mkiniz.poctime.economicgroup.domain;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface EconomicGroupRepository extends
+        JpaRepository<EconomicGroup, Long>,
+        JpaSpecificationExecutor<EconomicGroup> {
+    boolean existsByName(String name);
+
+    Page<EconomicGroup> findAll(Specification<EconomicGroup> spec, Pageable pageable);
+
+    Page<EconomicGroup> findAll(Pageable pageable);
+}
