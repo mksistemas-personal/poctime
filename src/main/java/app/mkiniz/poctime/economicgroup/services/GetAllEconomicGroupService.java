@@ -42,7 +42,7 @@ class GetAllEconomicGroupService implements GetAllBusinessUseCase<String, Maybe<
                                 groups.hasNext()));
     }
 
-    private static class EconomicGroupSpecifications {
+    public static class EconomicGroupSpecifications {
 
         public static Specification<EconomicGroup> textSearch(String term) {
             return (root, query, cb) -> {
@@ -53,11 +53,19 @@ class GetAllEconomicGroupService implements GetAllBusinessUseCase<String, Maybe<
                         "websearch_to_tsquery",
                         Object.class,
                         cb.literal("portuguese"),
-                        cb.literal(term)
+                        cb.lower(cb.literal(term))
                 );
 
-                return cb.isTrue(
-                        cb.function("ts_match", Boolean.class, root.get("searchVector"), tsQuery)
+                Expression<Object> tsQuerySimple = cb.function(
+                        "to_tsquery",
+                        Object.class,
+                        cb.literal("simple"),
+                        cb.lower(cb.literal(term))
+                );
+
+                return cb.or(
+                        cb.isTrue(cb.function("ts_match", Boolean.class, root.get("searchVector"), tsQuery)),
+                        cb.isTrue(cb.function("ts_match", Boolean.class, root.get("searchVector"), tsQuerySimple))
                 );
             };
         }

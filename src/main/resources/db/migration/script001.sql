@@ -15,7 +15,7 @@ ALTER TABLE economicgroup
     ADD COLUMN search_vector tsvector GENERATED ALWAYS AS (
         setweight(to_tsvector('portuguese', coalesce(name, '')), 'A') ||
         setweight(to_tsvector('portuguese', coalesce(description, '')), 'B') ||
-        setweight(to_tsvector('portuguese', coalesce(immutable_jsonb_text("organization-ids"), '')), 'C')
+        setweight(to_tsvector('simple', coalesce(immutable_jsonb_text("organization-ids"), '')), 'C')
         ) STORED;
 
 -- Criamos um índice GIN para performance na busca

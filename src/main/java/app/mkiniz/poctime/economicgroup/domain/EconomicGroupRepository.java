@@ -7,11 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface EconomicGroupRepository extends
         JpaRepository<EconomicGroup, Long>,
         JpaSpecificationExecutor<EconomicGroup> {
     boolean existsByName(String name);
+
+    List<EconomicGroup> findAll(Specification<EconomicGroup> spec);
 
     Page<EconomicGroup> findAll(Specification<EconomicGroup> spec, Pageable pageable);
 
