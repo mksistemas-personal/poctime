@@ -38,6 +38,7 @@ public class Person extends AbstractAggregateRoot<Person> implements EntityCreat
 
     private String name;
 
+    @Getter
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "document", columnDefinition = "jsonb", nullable = false)
     private Document<?, ?> document;

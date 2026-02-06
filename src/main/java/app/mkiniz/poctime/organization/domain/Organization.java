@@ -65,7 +65,7 @@ public class Organization extends AbstractAggregateRoot<Organization> implements
     @Override
     public void created() {
         this.registerEvent(OrganizationAddedEvent.builder()
-                .organizationId(Tsid.from(this.person.getId()))
+                .organizationId(Tsid.from(this.getId()))
                 .responsibleId(Tsid.from(responsiblePerson.getId()))
                 .responsibleEmail(responsibleEmail)
                 .address(address)
@@ -75,7 +75,7 @@ public class Organization extends AbstractAggregateRoot<Organization> implements
     @Override
     public void deleted() {
         this.registerEvent(OrganizationDeletedEvent.builder()
-                .organizationId(Tsid.from(this.person.getId()))
+                .organizationId(Tsid.from(this.getId()))
                 .responsibleId(Tsid.from(responsiblePerson.getId()))
                 .responsibleEmail(responsibleEmail)
                 .address(address)
@@ -85,7 +85,7 @@ public class Organization extends AbstractAggregateRoot<Organization> implements
     @Override
     public void updated() {
         this.registerEvent(OrganizationUpdatedEvent.builder()
-                .organizationId(Tsid.from(this.person.getId()))
+                .organizationId(Tsid.from(this.getId()))
                 .responsibleId(Tsid.from(responsiblePerson.getId()))
                 .responsibleEmail(responsibleEmail)
                 .address(address)

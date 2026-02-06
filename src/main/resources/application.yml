@@ -20,7 +20,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: app.mkiniz.poctime.shared.repository.PostgreSQLDialectCustom
 
   rabbitmq:
     host: localhost
@@ -30,15 +30,40 @@ spring:
     virtual-host: poctime
 
   cloud:
+    function:
+      definition: organizationDeleted
     stream:
       bindings:
+        # Exchanges
         exchangePerson-out-0:
           destination: exchange.person
           content-type: application/json
         exchangeOrganization-out-0:
           destination: exchange.organization
           content-type: application/json
+        exchangeEconomicGroup-out-0:
+          destination: exchange.economicgroup
+          content-type: application/json
+        # Queues
+        organizationDeleted-in-0:
+          destination: exchange.organization
+          group: economic-group-service
+          content-type: application/json
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 1000
+            back-off-max-interval: 10000
+            back-off-multiplier: 2.0
       rabbit:
+        default:
+          consumer:
+            auto-bind-dlq: true
+            republish-to-dlq: true
+            dead-letter-exchange: dlx.poctime
+            dead-letter-routing-key: poctime.error
+            dead-letter-queue-name: queue.poctime.dlq
+            queue-type: quorum # Define todas as filas como Quorum
+            dlq-queue-type: classic
         bindings:
           exchangePerson-out-0:
             producer:
@@ -50,6 +75,22 @@ spring:
               routing-key-expression: "''"
               exchangeType: headers
               declare-exchange: true
+          exchangeEconomicGroup-out-0:
+            producer:
+              routing-key-expression: "''"
+              exchangeType: headers
+              declare-exchange: true
+          organizationDeleted-in-0:
+            consumer:
+              exchangeType: headers
+              bindQueue: true
+              declareExchange: true
+              queueNameGroupOnly: true
+              quorum.enabled: true
+              queueBindingArguments:
+                x-match: any
+                event_type: OrganizationDeletedEvent
+
 
 server:
   port: 8181

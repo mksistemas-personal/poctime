@@ -23,18 +23,18 @@ class OrganizationEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrganizationCreated(OrganizationAddedEvent event) {
         Message<OrganizationAddedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(OrganizationConstants.ORGANIZATION_BINDING_NAME, message);
+        streamBridge.send(OrganizationConstants.ORGANIZATION_EXCHANGE_OUT, message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlePersonUpdated(OrganizationUpdatedEvent event) {
+    public void handlePOrganizationUpdated(OrganizationUpdatedEvent event) {
         Message<OrganizationUpdatedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(OrganizationConstants.ORGANIZATION_BINDING_NAME, message);
+        streamBridge.send(OrganizationConstants.ORGANIZATION_EXCHANGE_OUT, message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlePersonDeleted(OrganizationDeletedEvent event) {
+    public void handlePOrganizationDeleted(OrganizationDeletedEvent event) {
         Message<OrganizationDeletedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(OrganizationConstants.ORGANIZATION_BINDING_NAME, message);
+        streamBridge.send(OrganizationConstants.ORGANIZATION_EXCHANGE_OUT, message);
     }
 }

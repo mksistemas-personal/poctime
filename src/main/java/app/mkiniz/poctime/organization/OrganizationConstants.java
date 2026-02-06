@@ -19,7 +19,7 @@ public class OrganizationConstants {
 
 
     // STREAM CONSTANTS
-    public static final String ORGANIZATION_BINDING_NAME = "exchangeOrganization-out-0";
+    public static final String ORGANIZATION_EXCHANGE_OUT = "exchangeOrganization-out-0";
 
 
 }
