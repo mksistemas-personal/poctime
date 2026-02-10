@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.organization.adapters;
 
+import app.mkiniz.poctime.organization.GetOrganizationFromListUseCase;
 import app.mkiniz.poctime.organization.domain.*;
 import app.mkiniz.poctime.shared.business.*;
 import com.github.f4b6a3.tsid.Tsid;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -32,6 +34,7 @@ public class OrganizationController {
     private final GetByIdBusinessUseCase<Tsid, OrganizationResponse> getOrganizationByIdService;
     private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationResponse>>> getAllOrganizationService;
     private final GetAllBusinessUseCase<String, Maybe<Slice<OrganizationProjectionResponse>>> getAllOrganizationProjectionService;
+    private final GetOrganizationFromListUseCase getOrganizationFromListUseCase;
 
     @PostMapping
     public OrganizationResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
@@ -77,6 +80,13 @@ public class OrganizationController {
         String documentType = Objects.nonNull(docType) ? docType.toLowerCase() : null;
         return getAllOrganizationProjectionService.execute(pageable, documentType)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping(path = "/projection/from-list")
+    public ResponseEntity<Slice<GetOrganizationFromListUseCase.OrganizationListView>> getAllOrganizationsFromListProjection(
+            @RequestParam(name = "ids", required = false) List<Tsid> ids) {
+        GetOrganizationFromListUseCase.OrganizationListRequest request = new GetOrganizationFromListUseCase.OrganizationListRequest(ids);
+        return ResponseEntity.ok(getOrganizationFromListUseCase.execute(request));
     }
 
 }
