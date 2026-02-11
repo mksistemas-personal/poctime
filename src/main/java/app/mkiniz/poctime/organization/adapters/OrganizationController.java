@@ -44,7 +44,7 @@ public class OrganizationController {
     @PutMapping(path = "/{id}")
     public ResponseEntity<OrganizationResponse> updateOrganization(@PathVariable Tsid id, @Valid @RequestBody UpdateOrganizationRequest request) {
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(updateOrganizationService.execute(id, request));
     }
 
