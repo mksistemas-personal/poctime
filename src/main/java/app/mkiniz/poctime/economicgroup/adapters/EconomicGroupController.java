@@ -56,7 +56,7 @@ public class EconomicGroupController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<EconomicGroupResponse>> getAllEconomicGroup(@PathVariable(required = false) String term, Pageable pageable) {
+    public ResponseEntity<Slice<EconomicGroupResponse>> getAllEconomicGroup(@RequestParam(required = false) String term, Pageable pageable) {
         return getAllEconomicGroupService.execute(pageable, term)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }

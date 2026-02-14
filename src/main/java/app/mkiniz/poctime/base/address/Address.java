@@ -3,7 +3,7 @@ package app.mkiniz.poctime.base.address;
 import jakarta.persistence.Embeddable;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 @Embeddable
 public record Address(
         String street,
