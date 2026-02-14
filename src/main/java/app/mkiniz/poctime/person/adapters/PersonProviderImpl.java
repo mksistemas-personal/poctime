@@ -10,11 +10,13 @@ import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import com.github.f4b6a3.tsid.Tsid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @AllArgsConstructor
 @Component
+@Transactional
 class PersonProviderImpl implements PersonProvider {
 
     private final PersonRepository personRepository;
@@ -29,5 +31,10 @@ class PersonProviderImpl implements PersonProvider {
     public Person createPerson(String name, Document<?, ?> document) {
         PersonResponse response = addPersonService.execute(new PersonRequest(name, document));
         return response.toPerson();
+    }
+
+    @Override
+    public Long count() {
+        return personRepository.count();
     }
 }

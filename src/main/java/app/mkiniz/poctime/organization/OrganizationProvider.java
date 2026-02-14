@@ -8,4 +8,7 @@ public interface OrganizationProvider {
     boolean canRemovePerson(Tsid personId);
 
     List<String> getOrganizationsNotFound(List<String> ids);
+
+    Long count();
+
 }

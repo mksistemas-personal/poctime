@@ -10,4 +10,6 @@ public interface PersonProvider {
     Optional<Person> getPerson(Tsid id);
 
     Person createPerson(String name, Document<?, ?> document);
+
+    Long count();
 }
