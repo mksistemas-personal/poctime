@@ -25,7 +25,7 @@ import java.util.Objects;
 @Table(name = "person")
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE person SET deleted = true WHERE id = ?")
@@ -38,10 +38,13 @@ public class Person extends AbstractAggregateRoot<Person> implements EntityCreat
 
     private String name;
 
-    @Getter
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "document", columnDefinition = "jsonb", nullable = false)
     private Document<?, ?> document;
+
+    public Document<?, ?> getDocument() {
+        return document;
+    }
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;

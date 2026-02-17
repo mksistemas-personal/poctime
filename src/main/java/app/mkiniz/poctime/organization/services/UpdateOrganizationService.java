@@ -38,7 +38,9 @@ class UpdateOrganizationService implements UpdateBusinessUseCase<Tsid, UpdateOrg
                 .flatMap(this::validateOrganizationPerson)
                 .flatMap(this::updateOrganization)
                 .map(context -> OrganizationResponse.from(context.organization))
-                .fold(this::throwBusinessException, response -> response);
+                .fold(error -> {
+                    throw error;
+                }, response -> response);
     }
 
     private Either<BusinessException, Context> validateOrganizationPerson(Context context) {
