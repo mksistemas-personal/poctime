@@ -31,7 +31,7 @@ spring:
 
   cloud:
     function:
-      definition: organizationDeleted
+      definition: economicGroupOrganizationDeleted
     stream:
       bindings:
         # Exchanges
@@ -48,7 +48,7 @@ spring:
           destination: exchange.client
           content-type: application/json
         # Queues
-        organizationDeleted-in-0:
+        "economicGroup organizationDeleted-in-0":
           destination: exchange.organization
           group: economic-group-service
           content-type: application/json
@@ -60,6 +60,7 @@ spring:
       rabbit:
         default:
           consumer:
+            queueNameGroupOnly: true
             auto-bind-dlq: true
             republish-to-dlq: true
             dead-letter-exchange: dlx.poctime
@@ -72,28 +73,27 @@ spring:
             producer:
               routing-key-expression: "''"
               exchangeType: headers
-              declare-exchange: true
+              declareExchange: true
           exchangeOrganization-out-0:
             producer:
               routing-key-expression: "''"
               exchangeType: headers
-              declare-exchange: true
+              declareExchange: true
           exchangeEconomicGroup-out-0:
             producer:
               routing-key-expression: "''"
               exchangeType: headers
-              declare-exchange: true
+              declareExchange: true
           exchangeClient-out-0:
             producer:
               routing-key-expression: "''"
               exchangeType: headers
-              declare-exchange: true
-          organizationDeleted-in-0:
+              declareExchange: true
+          "economicGroup organizationDeleted-in-0":
             consumer:
               exchangeType: headers
               bindQueue: true
               declareExchange: true
-              queueNameGroupOnly: true
               quorum.enabled: true
               queueBindingArguments:
                 x-match: any
@@ -102,3 +102,8 @@ spring:
 
 server:
   port: 8181
+
+logging:
+  level:
+    org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
+    org.springframework.cloud.stream.binder.rabbit: DEBUG

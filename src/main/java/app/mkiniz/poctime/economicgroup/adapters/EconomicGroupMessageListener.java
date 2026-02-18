@@ -21,7 +21,7 @@ public class EconomicGroupMessageListener {
     private final ValidateHelper validator;
 
     @Bean
-    public Consumer<Message<OrganizationDeletedEvent>> organizationDeleted() {
+    public Consumer<Message<OrganizationDeletedEvent>> economicGroupOrganizationDeleted() {
         return message -> {
             OrganizationDeletedEvent event = message.getPayload();
             RemoveOrganizationUseCase.RemoveOrganizationRequest request =
