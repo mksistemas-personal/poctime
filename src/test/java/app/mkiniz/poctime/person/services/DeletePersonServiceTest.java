@@ -1,6 +1,7 @@
 package app.mkiniz.poctime.person.services;
 
 import app.mkiniz.poctime.base.document.bra.CpfDocument;
+import app.mkiniz.poctime.client.ClientProvider;
 import app.mkiniz.poctime.organization.OrganizationProvider;
 import app.mkiniz.poctime.person.PersonConstants;
 import app.mkiniz.poctime.person.domain.Person;
@@ -30,6 +31,9 @@ class DeletePersonServiceTest {
     @Mock
     private OrganizationProvider organizationProvider;
 
+    @Mock
+    private ClientProvider clientProvider;
+
     private DeleteBaseBusinessTest<Tsid, PersonResponse> baseTest;
     private CpfDocument cpfDocument;
 
@@ -49,9 +53,10 @@ class DeletePersonServiceTest {
                                     Person.builder().id(1L).name("name-del").document(cpfDocument).build())
                     );
                     when(organizationProvider.canRemovePerson(id)).thenReturn(true);
+                    when(clientProvider.canRemovePerson(id)).thenReturn(true);
                     return id;
                 })
-                .when(() -> new DeletePersonService(personRepository, organizationProvider))
+                .when(() -> new DeletePersonService(personRepository, organizationProvider, clientProvider))
                 .then((tsid, response) -> {
                     assertNotNull(response);
                     assertEquals(tsid.toLowerCase(), response.id());
@@ -71,7 +76,7 @@ class DeletePersonServiceTest {
                     when(personRepository.findById(anyLong())).thenReturn(Optional.empty());
                     return Tsid.from(1L);
                 })
-                .when(() -> new DeletePersonService(personRepository, organizationProvider))
+                .when(() -> new DeletePersonService(personRepository, organizationProvider, clientProvider))
                 .execute());
         assertNotNull(exception);
         assertEquals(PersonConstants.ID_NOT_FOUND, exception.getMessage());
