@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.person.services;
 
+import app.mkiniz.poctime.client.ClientProvider;
 import app.mkiniz.poctime.organization.OrganizationProvider;
 import app.mkiniz.poctime.person.PersonConstants;
 import app.mkiniz.poctime.person.domain.Person;
@@ -20,12 +21,14 @@ class DeletePersonService implements DeleteBusinessUseCase<Tsid, PersonResponse>
 
     private final PersonRepository personRepository;
     private final OrganizationProvider organizationProvider;
+    private final ClientProvider clientProvider;
 
     @Override
     public PersonResponse execute(Tsid id) {
         return (PersonResponse) Either.<BusinessException, Tsid>right(id)
                 .flatMap(this::findPerson)
-                .flatMap(this::canRemovePerson)
+                .flatMap(this::canRemovePersonFromOrganization)
+                .flatMap(this::canRemovePersonFromClient)
                 .flatMap(this::deletePerson)
                 .map(PersonResponse::fromPerson)
                 .fold(this::throwBusinessException, personResponse -> personResponse);
@@ -43,9 +46,15 @@ class DeletePersonService implements DeleteBusinessUseCase<Tsid, PersonResponse>
         return Either.right(person);
     }
 
-    private Either<? extends BusinessException, Person> canRemovePerson(Person person) {
+    private Either<? extends BusinessException, Person> canRemovePersonFromOrganization(Person person) {
         if (organizationProvider.canRemovePerson(Tsid.from(person.getId())))
             return Either.right(person);
         return Either.left(new BusinessException(PersonConstants.CANNOT_REMOVE_PERSON_ORGANIZATION));
+    }
+
+    private Either<? extends BusinessException, Person> canRemovePersonFromClient(Person person) {
+        if (clientProvider.canRemovePerson(Tsid.from(person.getId())))
+            return Either.right(person);
+        return Either.left(new BusinessException(PersonConstants.CANNOT_REMOVE_PERSON_CLIENT));
     }
 }
