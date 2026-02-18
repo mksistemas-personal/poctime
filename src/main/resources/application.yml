@@ -44,6 +44,9 @@ spring:
         exchangeEconomicGroup-out-0:
           destination: exchange.economicgroup
           content-type: application/json
+        exchangeClient-out-0:
+          destination: exchange.client
+          content-type: application/json
         # Queues
         organizationDeleted-in-0:
           destination: exchange.organization
@@ -76,6 +79,11 @@ spring:
               exchangeType: headers
               declare-exchange: true
           exchangeEconomicGroup-out-0:
+            producer:
+              routing-key-expression: "''"
+              exchangeType: headers
+              declare-exchange: true
+          exchangeClient-out-0:
             producer:
               routing-key-expression: "''"
               exchangeType: headers

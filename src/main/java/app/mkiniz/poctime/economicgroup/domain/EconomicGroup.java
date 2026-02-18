@@ -27,7 +27,7 @@ import java.util.Set;
 @Table(name = "economicgroup")
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE economicgroup SET deleted = true WHERE id = ?")
@@ -75,21 +75,21 @@ public class EconomicGroup extends AbstractAggregateRoot<EconomicGroup> implemen
     @Override
     public void deleted() {
         this.registerEvent(EconomicGroupDeletedEvent.builder()
-                        .id(this.getId().toString())
-                        .name(this.getName())
-                        .description(this.getDescription())
-                        .organizationIds(this.getOrganizationIds().stream().toList()))
-                .build();
+                .id(this.getId().toString())
+                .name(this.getName())
+                .description(this.getDescription())
+                .organizationIds(this.getOrganizationIds().stream().toList())
+                .build());
     }
 
     @Override
     public void updated() {
         this.registerEvent(EconomicGroupUpdatedEvent.builder()
-                        .id(this.getId().toString())
-                        .name(this.getName())
-                        .description(this.getDescription())
-                        .organizationIds(this.getOrganizationIds().stream().toList()))
-                .build();
+                .id(this.getId().toString())
+                .name(this.getName())
+                .description(this.getDescription())
+                .organizationIds(this.getOrganizationIds().stream().toList())
+                .build());
     }
 
 }

@@ -37,8 +37,8 @@ public class OrganizationController {
     private final GetOrganizationFromListUseCase getOrganizationFromListUseCase;
 
     @PostMapping
-    public OrganizationResponse createOrganization(@Valid @RequestBody OrganizationRequest request) {
-        return addOrganizationService.execute(request);
+    public ResponseEntity<OrganizationResponse> createOrganization(@Valid @RequestBody OrganizationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(addOrganizationService.execute(request));
     }
 
     @PutMapping(path = "/{id}")

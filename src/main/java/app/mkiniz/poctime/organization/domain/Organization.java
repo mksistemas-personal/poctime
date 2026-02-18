@@ -22,7 +22,7 @@ import java.util.Objects;
 @Table(name = "organization")
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE organization SET deleted = true WHERE id = ?")

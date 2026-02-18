@@ -16,4 +16,7 @@ public record Address(
         String country,
         String stateCode
 ) {
+    public static AddressBuilder builder() {
+        return new AddressBuilder();
+    }
 }
