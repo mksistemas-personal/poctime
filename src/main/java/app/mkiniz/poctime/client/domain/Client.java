@@ -58,13 +58,19 @@ public class Client extends AbstractAggregateRoot<Client> implements EntityCreat
 
     @Override
     public void created() {
-        // Implement domain event if needed, following Organization pattern
+        this.registerEvent(ClientAddedEvent.builder()
+                .clientId(Tsid.from(this.getId()))
+                .person(PersonResponse.from(this.getPerson()))
+                .clientEmail(this.getClientEmail())
+                .address(this.getAddress())
+                .build());
     }
 
     @Override
     public void deleted() {
         this.registerEvent(ClientDeletedEvent.builder()
                 .clientId(Tsid.from(this.getId()))
+                .person(PersonResponse.from(this.getPerson()))
                 .clientEmail(this.getClientEmail())
                 .address(this.getAddress())
                 .build());
@@ -72,5 +78,10 @@ public class Client extends AbstractAggregateRoot<Client> implements EntityCreat
 
     @Override
     public void updated() {
+        this.registerEvent(ClientUpdatedEvent.builder()
+                .clientId(Tsid.from(this.getId()))
+                .person(PersonResponse.from(this.getPerson()))
+                .clientEmail(this.getClientEmail())
+                .address(this.getAddress()));
     }
 }
