@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.dashboard.services;
 
+import app.mkiniz.poctime.client.ClientProvider;
 import app.mkiniz.poctime.dashboard.DashboardQueryUseCase;
 import app.mkiniz.poctime.economicgroup.EconomicGroupProvider;
 import app.mkiniz.poctime.organization.OrganizationProvider;
@@ -16,6 +17,7 @@ class DashboardQuery implements DashboardQueryUseCase {
     private final PersonProvider personProvider;
     private final OrganizationProvider organizationProvider;
     private final EconomicGroupProvider economicGroupProvider;
+    private final ClientProvider clientProvider;
 
     @Override
     public DashboardResponse execute() {
@@ -23,6 +25,7 @@ class DashboardQuery implements DashboardQueryUseCase {
                 .totalPersons(personProvider.count())
                 .totalOrganizations(organizationProvider.count())
                 .totalEconomicGroups(economicGroupProvider.count())
+                .totalClients(clientProvider.count())
                 .build();
     }
 }
