@@ -7,7 +7,7 @@ import app.mkiniz.poctime.person.domain.PersonUpdatedEvent;
 import app.mkiniz.poctime.shared.adapter.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -18,23 +18,23 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 class PersonEventListener {
 
-    private final StreamBridge streamBridge;
+    private final RabbitTemplate rabbitTemplate;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePersonCreated(PersonAddedEvent event) {
         Message<PersonAddedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(PersonConstants.PERSON_BINDING_NAME, message);
+        rabbitTemplate.convertAndSend(PersonConstants.PERSON_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePersonUpdated(PersonUpdatedEvent event) {
         Message<PersonUpdatedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(PersonConstants.PERSON_BINDING_NAME, message);
+        rabbitTemplate.convertAndSend(PersonConstants.PERSON_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePersonDeleted(PersonDeletedEvent event) {
         Message<PersonDeletedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(PersonConstants.PERSON_BINDING_NAME, message);
+        rabbitTemplate.convertAndSend(PersonConstants.PERSON_EXCHANGE, "", message);
     }
 }

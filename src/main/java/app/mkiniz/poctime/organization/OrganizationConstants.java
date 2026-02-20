@@ -18,8 +18,8 @@ public class OrganizationConstants {
     public static final String ORGANIZATION_NOT_FOUND = "organization.not.found";
 
 
-    // STREAM CONSTANTS
-    public static final String ORGANIZATION_EXCHANGE_OUT = "exchangeOrganization-out-0";
+    // RABBITMQ CONSTANTS
+    public static final String ORGANIZATION_EXCHANGE = "exchange.organization";
 
 
 }

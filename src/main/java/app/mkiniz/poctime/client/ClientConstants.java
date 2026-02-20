@@ -11,6 +11,6 @@ public class ClientConstants {
     public static final String CLIENT_EMAIL_NOT_NULL = "client.email.not.null";
     public static final String CLIENT_NOT_FOUND = "client.not.found";
 
-    // STREAM CONSTANTS
-    public static final String CLIENT_EXCHANGE_OUT = "exchangeClient-out-0";
+    // RABBITMQ CONSTANTS
+    public static final String CLIENT_EXCHANGE = "exchange.client";
 }

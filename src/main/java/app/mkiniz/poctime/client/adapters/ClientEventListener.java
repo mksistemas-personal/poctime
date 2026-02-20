@@ -7,7 +7,7 @@ import app.mkiniz.poctime.client.domain.ClientUpdatedEvent;
 import app.mkiniz.poctime.shared.adapter.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -18,23 +18,23 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 class ClientEventListener {
 
-    private final StreamBridge streamBridge;
+    private final RabbitTemplate rabbitTemplate;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleClientCreated(ClientAddedEvent event) {
         Message<ClientAddedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(ClientConstants.CLIENT_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleClientUpdated(ClientUpdatedEvent event) {
         Message<ClientUpdatedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(ClientConstants.CLIENT_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleClientDeleted(ClientDeletedEvent event) {
         Message<ClientDeletedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(ClientConstants.CLIENT_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_EXCHANGE, "", message);
     }
 }

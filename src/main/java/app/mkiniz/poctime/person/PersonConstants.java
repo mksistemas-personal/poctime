@@ -10,8 +10,8 @@ public class PersonConstants {
     public static final String CANNOT_REMOVE_PERSON_ORGANIZATION = "person.cannot.remove.because.organization";
     public static final String CANNOT_REMOVE_PERSON_CLIENT = "person.cannot.remove.because.client";
 
-    // STREAM CONSTANTS
-    public static final String PERSON_BINDING_NAME = "exchangePerson-out-0";
+    // RABBITMQ CONSTANTS
+    public static final String PERSON_EXCHANGE = "exchange.person";
 
 
 }

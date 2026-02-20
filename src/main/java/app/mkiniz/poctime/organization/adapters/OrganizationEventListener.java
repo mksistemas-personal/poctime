@@ -7,7 +7,7 @@ import app.mkiniz.poctime.organization.domain.OrganizationUpdatedEvent;
 import app.mkiniz.poctime.shared.adapter.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -18,23 +18,23 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 class OrganizationEventListener {
 
-    private final StreamBridge streamBridge;
+    private final RabbitTemplate rabbitTemplate;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrganizationCreated(OrganizationAddedEvent event) {
         Message<OrganizationAddedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(OrganizationConstants.ORGANIZATION_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePOrganizationUpdated(OrganizationUpdatedEvent event) {
         Message<OrganizationUpdatedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(OrganizationConstants.ORGANIZATION_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePOrganizationDeleted(OrganizationDeletedEvent event) {
         Message<OrganizationDeletedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(OrganizationConstants.ORGANIZATION_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_EXCHANGE, "", message);
     }
 }

@@ -8,6 +8,6 @@ public class EconomicGroupConstants {
     public static final String REMOVE_ORGANIZATION_IDS_NOT_NULL = "economicgroup.remove.organization.ids.not.null";
     public static final String REMOVE_ORGANIZATION_IDS_NOT_EMPTY = "economicgroup.remove.organization.ids.not.empty";
 
-    // STREAM CONSTANTS
-    public static final String ECONOMIC_GROUP_EXCHANGE_OUT = "exchangeEconomicGroup-out-0";
+    // RABBITMQ CONSTANTS
+    public static final String ECONOMIC_GROUP_EXCHANGE = "exchange.economicgroup";
 }

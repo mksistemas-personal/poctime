@@ -7,7 +7,7 @@ import app.mkiniz.poctime.economicgroup.domain.EconomicGroupUpdatedEvent;
 import app.mkiniz.poctime.shared.adapter.MessageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -18,23 +18,23 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 class EconomicGroupEventListener {
 
-    private final StreamBridge streamBridge;
+    private final RabbitTemplate rabbitTemplate;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEconomiGroupCreated(EconomicGroupAddedEvent event) {
         Message<EconomicGroupAddedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEconomiGroupUpdated(EconomicGroupUpdatedEvent event) {
         Message<EconomicGroupUpdatedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEconomiGroupDeleted(EconomicGroupDeletedEvent event) {
         Message<EconomicGroupDeletedEvent> message = MessageHelper.buildMessage(event);
-        streamBridge.send(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE_OUT, message);
+        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE, "", message);
     }
 }
