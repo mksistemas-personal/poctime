@@ -4,11 +4,11 @@ import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRequest;
 import app.mkiniz.poctime.person.domain.PersonResponse;
 import app.mkiniz.poctime.shared.business.*;
+import app.mkiniz.poctime.shared.specification.JsonPathLike;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
@@ -55,7 +55,7 @@ public class PersonController {
     public ResponseEntity<Slice<PersonResponse>> getAllPeople(
             @And({
                     @Spec(path = "name", params = "name", spec = LikeIgnoreCase.class),
-                    @Spec(path = "identifier", params = "identifier", spec = EqualIgnoreCase.class)
+                    @Spec(path = "document.identifier", params = "identifier", spec = JsonPathLike.class)
             }) Specification<Person> spec, Pageable pageable) {
         return getAllPersonService.execute(pageable, spec)
                 .fold(

@@ -13,5 +13,10 @@ public class PostgreSQLDialectCustom extends PostgreSQLDialect {
                 "ts_match",
                 "(?1 @@ ?2)"
         );
+
+        functionContributions.getFunctionRegistry().registerPattern(
+                "jsonb_extract_path_text",
+                "jsonb_extract_path_text(?1, ?2)"
+        );
     }
 }
