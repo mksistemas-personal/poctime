@@ -7,9 +7,7 @@ import app.mkiniz.poctime.shared.business.GetAllBusinessUseCase;
 import cyclops.control.Maybe;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +25,15 @@ class GetAllOrganizationService implements GetAllBusinessUseCase<Specification<O
 
     @Override
     public Maybe<Slice<OrganizationResponse>> execute(Pageable pageable, @Nullable Specification<Organization> organizationSpecification) {
+        Pageable pageableWithSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort().and(Sort.by("id")));
+
         return Maybe.fromEval(later(() -> Objects.nonNull(organizationSpecification) ?
-                        organizationRepository.findAll(organizationSpecification, pageable) :
-                        organizationRepository.findAll(pageable)))
+                        organizationRepository.findAll(organizationSpecification, pageableWithSort) :
+                        organizationRepository.findAll(pageableWithSort)))
                 .filter(Slice::hasContent)
                 .map(orgs ->
                         new SliceImpl<>(orgs.map(OrganizationResponse::from).toList(),
-                                pageable,
+                                pageableWithSort,
                                 orgs.hasNext()));
 
     }
