@@ -30,6 +30,12 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
     @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "fk_product_category"))
     private Category category;
 
+    @Column(name = "description", columnDefinition = "text")
+    private String description;
+
+    @Column(name = "sku", columnDefinition = "varchar(100)")
+    private String sku;
+
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 

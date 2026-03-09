@@ -1,11 +1,15 @@
 package app.mkiniz.poctime.product.domain;
 
-public record ProductResponse(String id, String name, Category category) {
+import com.github.f4b6a3.tsid.Tsid;
+
+public record ProductResponse(String id, String name, CategoryResponse category, String sku, String description) {
     public static ProductResponse from(Product product) {
         return new ProductResponse(
-                product.getId().toString(),
+                Tsid.from(product.getId()).toLowerCase(),
                 product.getName(),
-                product.getCategory()
+                CategoryResponse.from(product.getCategory()),
+                product.getSku(),
+                product.getDescription()
         );
     }
 }

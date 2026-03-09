@@ -8,7 +8,9 @@ public record CreateProductRequest(
         @NotBlank(message = ProductConstants.NAME_NOT_BLANK)
         String name,
         @NotNull(message = ProductConstants.CATEGORY_NOT_NULL)
-        CategoryRequest category) {
-
+        CategoryRequest category,
+        @NotBlank(message = ProductConstants.SKU_NOT_BLANK)
+        String sku,
+        String description) {
 
 }
