@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @AllArgsConstructor
-class AddProductService implements AddBusinessUseCase<CreateProductRequest, ProductResponse> {
+class AddProductService implements AddBusinessUseCase<CreateProductRequest, ProductResponse>, ServiceDefaults {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
@@ -41,11 +41,7 @@ class AddProductService implements AddBusinessUseCase<CreateProductRequest, Prod
             return Either.left(new BusinessException(ProductConstants.CATEGORY_NOT_FOUND));
         }
         if (context.isNewCategory()) {
-            context.category = categoryRepository.save(
-                    Category.builder()
-                            .id(tsidGenerator.newIdAsLong())
-                            .name(context.request.category().name())
-                            .build());
+            context.category = saveNewCategory(categoryRepository, context.request.category().name());
             return Either.right(context);
         } else {
             Optional<Category> category = categoryRepository.findById(context.getCategoryRequestId());

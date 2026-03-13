@@ -17,7 +17,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @AllArgsConstructor
-class UpdateProductService implements UpdateBusinessUseCase<Tsid, UpdateProductRequest, ProductResponse> {
+class UpdateProductService implements UpdateBusinessUseCase<Tsid, UpdateProductRequest, ProductResponse>, ServiceDefaults {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
@@ -30,9 +30,7 @@ class UpdateProductService implements UpdateBusinessUseCase<Tsid, UpdateProductR
                 .flatMap(this::findCategory)
                 .flatMap(this::updateProduct)
                 .map(context -> ProductResponse.from(context.product))
-                .fold(error -> {
-                    throw error;
-                }, response -> response);
+                .fold(this::throwBusinessException, response -> response);
     }
 
     private Either<BusinessException, Context> findProduct(Context context) {
@@ -44,15 +42,11 @@ class UpdateProductService implements UpdateBusinessUseCase<Tsid, UpdateProductR
     }
 
     private Either<BusinessException, Context> findCategory(Context context) {
-        if (context.request.category() == null) {
+        if (context.categoryIsNull()) {
             return Either.left(new BusinessException(ProductConstants.CATEGORY_NOT_FOUND));
         }
         if (context.isNewCategory()) {
-            context.category = categoryRepository.save(
-                    Category.builder()
-                            .id(tsidGenerator.newIdAsLong())
-                            .name(context.request.category().name())
-                            .build());
+            context.category = saveNewCategory(categoryRepository, context.request.category().name());
             return Either.right(context);
         } else {
             Optional<Category> category = categoryRepository.findById(context.getCategoryRequestId());
@@ -90,6 +84,10 @@ class UpdateProductService implements UpdateBusinessUseCase<Tsid, UpdateProductR
 
         public boolean isNewCategory() {
             return Objects.isNull(request.category().id());
+        }
+
+        public boolean categoryIsNull() {
+            return Objects.isNull(request.category());
         }
     }
 }
