@@ -4,6 +4,7 @@ import app.mkiniz.poctime.product.domain.CreateProductRequest;
 import app.mkiniz.poctime.product.domain.ProductResponse;
 import app.mkiniz.poctime.product.domain.UpdateProductRequest;
 import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
+import app.mkiniz.poctime.shared.business.DeleteBusinessUseCase;
 import app.mkiniz.poctime.shared.business.UpdateBusinessUseCase;
 import com.github.f4b6a3.tsid.Tsid;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ public class ProductController {
 
     private final AddBusinessUseCase<CreateProductRequest, ProductResponse> addProductService;
     private final UpdateBusinessUseCase<Tsid, UpdateProductRequest, ProductResponse> updateProductService;
+    private final DeleteBusinessUseCase<Tsid, ProductResponse> deleteProductService;
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
@@ -30,6 +32,11 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Tsid id, @Valid @RequestBody UpdateProductRequest request) {
         return ResponseEntity.ok(updateProductService.execute(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProductResponse> deleteProduct(@PathVariable Tsid id) {
+        return ResponseEntity.ok(deleteProductService.execute(id));
     }
 
 }
