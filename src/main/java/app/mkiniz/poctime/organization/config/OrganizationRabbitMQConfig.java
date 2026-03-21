@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OrganizationRabbitMQConfig {
+
     @Bean
     public HeadersExchange organizationInputExchange() {
         return new HeadersExchange(OrganizationConstants.ORGANIZATION_INPUT_EXCHANGE);

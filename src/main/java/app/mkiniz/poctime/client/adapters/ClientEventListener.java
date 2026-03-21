@@ -23,18 +23,18 @@ class ClientEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleClientCreated(ClientAddedEvent event) {
         Message<ClientAddedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_OUTPUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleClientUpdated(ClientUpdatedEvent event) {
         Message<ClientUpdatedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_OUTPUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleClientDeleted(ClientDeletedEvent event) {
         Message<ClientDeletedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(ClientConstants.CLIENT_OUTPUT_EXCHANGE, "", message);
     }
 }

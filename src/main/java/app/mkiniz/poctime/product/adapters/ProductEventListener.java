@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 class ProductEventListener extends PocTimeEventListener<ProductAddedEvent, ProductUpdatedEvent, ProductDeletedEvent> {
 
     public ProductEventListener(RabbitTemplate rabbitTemplate) {
-        super(ProductConstants.PRODUCT_EXCHANGE, rabbitTemplate);
+        super(ProductConstants.PRODUCT_OUTPUT_EXCHANGE, rabbitTemplate);
     }
 
 }

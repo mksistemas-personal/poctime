@@ -20,6 +20,8 @@ public class EconomicGroupRabbitMQConfig {
     @Value("${rabbitmq.dlx-routing-key}")
     private String dlqRoutingKey;
 
+    // exchanges
+
     @Bean
     public HeadersExchange economicGroupInputExchange() {
         return new HeadersExchange(EconomicGroupConstants.ECONOMIC_GROUP_IN_EXCHANGE);

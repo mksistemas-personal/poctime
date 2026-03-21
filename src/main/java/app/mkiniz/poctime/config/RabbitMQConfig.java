@@ -1,7 +1,5 @@
 package app.mkiniz.poctime.config;
 
-import app.mkiniz.poctime.client.ClientConstants;
-import app.mkiniz.poctime.product.ProductConstants;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +17,6 @@ public class RabbitMQConfig {
 
     @Value("${rabbitmq.dlx-routing-key}")
     private String dlqRoutingKey;
-
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
@@ -41,19 +38,5 @@ public class RabbitMQConfig {
     public Binding deadLetterBinding() {
         return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with(dlqRoutingKey);
     }
-
-    // Main Exchanges
-
-
-    @Bean
-    public HeadersExchange clientExchange() {
-        return new HeadersExchange(ClientConstants.CLIENT_EXCHANGE);
-    }
-
-    @Bean
-    public HeadersExchange productExchange() {
-        return new HeadersExchange(ProductConstants.PRODUCT_EXCHANGE);
-    }
-
 
 }
