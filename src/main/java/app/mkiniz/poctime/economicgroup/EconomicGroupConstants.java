@@ -9,5 +9,6 @@ public class EconomicGroupConstants {
     public static final String REMOVE_ORGANIZATION_IDS_NOT_EMPTY = "economicgroup.remove.organization.ids.not.empty";
 
     // RABBITMQ CONSTANTS
-    public static final String ECONOMIC_GROUP_EXCHANGE = "exchange.economicgroup";
+    public static final String ECONOMIC_GROUP_IN_EXCHANGE = "exchange.in.economicgroup";
+    public static final String ECONOMIC_GROUP_OUT_EXCHANGE = "exchange.out.economicgroup";
 }

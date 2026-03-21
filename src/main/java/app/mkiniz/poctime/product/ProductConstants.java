@@ -8,4 +8,7 @@ public class ProductConstants {
     public static final String CATEGORY_NAME_NOT_NULL = "product.category.name.not.null";
     public static final String PRODUCT_NOT_NULL = "product.not.null";
     public static final String SKU_NOT_BLANK = "product.sku.not.blank";
+
+    // RABBITMQ CONSTANTS
+    public static final String PRODUCT_EXCHANGE = "exchange.product";
 }

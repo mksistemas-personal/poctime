@@ -35,3 +35,8 @@ server:
 logging:
   level:
     org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
+
+rabbitmq:
+  dlx-exchange: dlx.poctime
+  dlx-queue: dlx.poctime.queue
+  dlx-routing-key: poctime.error

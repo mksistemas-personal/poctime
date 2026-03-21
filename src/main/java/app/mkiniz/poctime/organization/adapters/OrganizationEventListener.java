@@ -23,18 +23,18 @@ class OrganizationEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrganizationCreated(OrganizationAddedEvent event) {
         Message<OrganizationAddedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_OUTPUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePOrganizationUpdated(OrganizationUpdatedEvent event) {
         Message<OrganizationUpdatedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_OUTPUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePOrganizationDeleted(OrganizationDeletedEvent event) {
         Message<OrganizationDeletedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(OrganizationConstants.ORGANIZATION_OUTPUT_EXCHANGE, "", message);
     }
 }

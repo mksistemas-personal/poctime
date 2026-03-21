@@ -23,18 +23,18 @@ class EconomicGroupEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEconomiGroupCreated(EconomicGroupAddedEvent event) {
         Message<EconomicGroupAddedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_OUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEconomiGroupUpdated(EconomicGroupUpdatedEvent event) {
         Message<EconomicGroupUpdatedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_OUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEconomiGroupDeleted(EconomicGroupDeletedEvent event) {
         Message<EconomicGroupDeletedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(EconomicGroupConstants.ECONOMIC_GROUP_OUT_EXCHANGE, "", message);
     }
 }

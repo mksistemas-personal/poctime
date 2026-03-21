@@ -23,18 +23,18 @@ class PersonEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePersonCreated(PersonAddedEvent event) {
         Message<PersonAddedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(PersonConstants.PERSON_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(PersonConstants.PERSON_OUTPUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePersonUpdated(PersonUpdatedEvent event) {
         Message<PersonUpdatedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(PersonConstants.PERSON_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(PersonConstants.PERSON_OUTPUT_EXCHANGE, "", message);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePersonDeleted(PersonDeletedEvent event) {
         Message<PersonDeletedEvent> message = MessageHelper.buildMessage(event);
-        rabbitTemplate.convertAndSend(PersonConstants.PERSON_EXCHANGE, "", message);
+        rabbitTemplate.convertAndSend(PersonConstants.PERSON_OUTPUT_EXCHANGE, "", message);
     }
 }

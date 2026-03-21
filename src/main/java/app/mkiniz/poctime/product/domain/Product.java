@@ -3,6 +3,7 @@ package app.mkiniz.poctime.product.domain;
 import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
+import com.github.f4b6a3.tsid.Tsid;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -41,16 +42,40 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
 
     @Override
     public void created() {
-        // Implementação necessária pela interface EntityCreated
+        this.registerEvent(
+                ProductAddedEvent
+                        .builder()
+                        .productId(Tsid.from(this.id))
+                        .name(this.name)
+                        .description(this.description)
+                        .sku(this.sku)
+                        .category(CategoryEvent.from(this.category))
+                        .build());
     }
 
     @Override
     public void updated() {
-        // Implementação necessária pela interface EntityUpdated
+        this.registerEvent(
+                ProductUpdatedEvent
+                        .builder()
+                        .productId(Tsid.from(this.id))
+                        .name(this.name)
+                        .description(this.description)
+                        .sku(this.sku)
+                        .category(CategoryEvent.from(this.category))
+                        .build());
     }
 
     @Override
     public void deleted() {
-        // Implementação necessária pela interface EntityDeleted
+        this.registerEvent(
+                ProductDeletedEvent
+                        .builder()
+                        .productId(Tsid.from(this.id))
+                        .name(this.name)
+                        .description(this.description)
+                        .sku(this.sku)
+                        .category(CategoryEvent.from(this.category))
+                        .build());
     }
 }
