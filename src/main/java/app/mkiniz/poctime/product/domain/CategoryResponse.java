@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.product.domain;
 
+import app.mkiniz.poctime.product.domain.category.Category;
 import com.github.f4b6a3.tsid.Tsid;
 
 public record CategoryResponse(String id, String name) {

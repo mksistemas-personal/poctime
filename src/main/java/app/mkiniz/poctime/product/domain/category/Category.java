@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.domain;
+package app.mkiniz.poctime.product.domain.category;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

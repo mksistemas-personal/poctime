@@ -1,5 +1,8 @@
 package app.mkiniz.poctime.product.domain;
 
+import app.mkiniz.poctime.product.domain.category.Category;
+import app.mkiniz.poctime.product.domain.category.CategoryEvent;
+import app.mkiniz.poctime.product.domain.taxdata.ProductTaxData;
 import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
@@ -9,6 +12,11 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.domain.AbstractAggregateRoot;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "product")
@@ -39,6 +47,22 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductTaxData> taxDataHistory;
+
+    /**
+     * Método auxiliar para obter os dados fiscais válidos para uma data específica.
+     */
+    public Optional<ProductTaxData> getTaxDataForDate(LocalDate date) {
+        if (Objects.isNull(taxDataHistory)) {
+            return Optional.empty();
+        }
+        return taxDataHistory.stream()
+                .filter(tax -> !date.isBefore(tax.getValidFrom()) &&
+                        (tax.getValidUntil() == null || !date.isAfter(tax.getValidUntil())))
+                .findFirst();
+    }
 
     @Override
     public void created() {

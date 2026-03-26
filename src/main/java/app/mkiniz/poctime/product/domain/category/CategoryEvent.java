@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.domain;
+package app.mkiniz.poctime.product.domain.category;
 
 import com.github.f4b6a3.tsid.Tsid;
 import lombok.Builder;

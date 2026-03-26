@@ -1,7 +1,7 @@
 package app.mkiniz.poctime.product.services;
 
-import app.mkiniz.poctime.product.domain.Category;
-import app.mkiniz.poctime.product.domain.CategoryRepository;
+import app.mkiniz.poctime.product.domain.category.Category;
+import app.mkiniz.poctime.product.domain.category.CategoryRepository;
 import com.github.f4b6a3.tsid.TsidFactory;
 
 public interface ServiceDefaults {
