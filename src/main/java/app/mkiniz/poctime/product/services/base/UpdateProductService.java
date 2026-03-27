@@ -1,15 +1,17 @@
-package app.mkiniz.poctime.product.services;
+package app.mkiniz.poctime.product.services.base;
 
 import app.mkiniz.poctime.product.ProductConstants;
-import app.mkiniz.poctime.product.domain.CreateProductRequest;
 import app.mkiniz.poctime.product.domain.Product;
 import app.mkiniz.poctime.product.domain.ProductRepository;
 import app.mkiniz.poctime.product.domain.ProductResponse;
+import app.mkiniz.poctime.product.domain.UpdateProductRequest;
 import app.mkiniz.poctime.product.domain.category.Category;
 import app.mkiniz.poctime.product.domain.category.CategoryRepository;
+import app.mkiniz.poctime.product.services.ServiceDefaults;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
-import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import app.mkiniz.poctime.shared.business.BusinessException;
+import app.mkiniz.poctime.shared.business.UpdateBusinessUseCase;
+import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Either;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,28 +23,32 @@ import java.util.Optional;
 @Service
 @Transactional
 @AllArgsConstructor
-class AddProductService implements AddBusinessUseCase<CreateProductRequest, ProductResponse>, ServiceDefaults {
+class UpdateProductService implements UpdateBusinessUseCase<Tsid, UpdateProductRequest, ProductResponse>, ServiceDefaults {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final TsidGenerator tsidGenerator;
 
     @Override
-    public ProductResponse execute(CreateProductRequest request) {
-        return (ProductResponse) createContext(request)
+    public ProductResponse execute(Tsid id, UpdateProductRequest request) {
+        return (ProductResponse) Either.<BusinessException, Context>right(new Context(id, request))
+                .flatMap(this::findProduct)
                 .flatMap(this::findCategory)
-                .flatMap(this::createProduct)
-                .flatMap(this::saveProduct)
+                .flatMap(this::updateProduct)
                 .map(context -> ProductResponse.from(context.product))
                 .fold(this::throwBusinessException, response -> response);
     }
 
-    private Either<BusinessException, Context> createContext(CreateProductRequest request) {
-        return Either.right(Context.of(request));
+    private Either<BusinessException, Context> findProduct(Context context) {
+        Optional<Product> product = productRepository.findById(context.id.toLong());
+        product.ifPresent(value -> context.product = value);
+        return product.isPresent() ?
+                Either.right(context) :
+                Either.left(new BusinessException(ProductConstants.PRODUCT_NOT_FOUND));
     }
 
     private Either<BusinessException, Context> findCategory(Context context) {
-        if (context.request.category() == null) {
+        if (context.categoryIsNull()) {
             return Either.left(new BusinessException(ProductConstants.CATEGORY_NOT_FOUND));
         }
         if (context.isNewCategory()) {
@@ -57,34 +63,25 @@ class AddProductService implements AddBusinessUseCase<CreateProductRequest, Prod
         }
     }
 
-    private Either<BusinessException, Context> createProduct(Context context) {
-        context.product = Product.builder()
-                .id(new TsidGenerator().newIdAsLong())
-                .name(context.request.name())
-                .category(context.category)
-                .sku(context.request.sku())
-                .description(context.request.description())
-                .build();
-        return Either.right(context);
-    }
-
-    private Either<BusinessException, Context> saveProduct(Context context) {
-        context.product.created();
+    private Either<BusinessException, Context> updateProduct(Context context) {
+        context.product.setName(context.request.name());
+        context.product.setCategory(context.category);
+        context.product.setSku(context.request.sku());
+        context.product.setDescription(context.request.description());
+        context.product.updated();
         context.product = productRepository.save(context.product);
         return Either.right(context);
     }
 
     private static class Context {
-        public final CreateProductRequest request;
+        public final Tsid id;
+        public final UpdateProductRequest request;
         public Category category;
         public Product product;
 
-        private Context(CreateProductRequest request) {
+        private Context(Tsid id, UpdateProductRequest request) {
+            this.id = id;
             this.request = request;
-        }
-
-        public static Context of(CreateProductRequest request) {
-            return new Context(request);
         }
 
         public long getCategoryRequestId() {
@@ -93,6 +90,10 @@ class AddProductService implements AddBusinessUseCase<CreateProductRequest, Prod
 
         public boolean isNewCategory() {
             return Objects.isNull(request.category().id());
+        }
+
+        public boolean categoryIsNull() {
+            return Objects.isNull(request.category());
         }
     }
 }

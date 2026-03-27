@@ -3,6 +3,7 @@ package app.mkiniz.poctime.product.domain;
 import app.mkiniz.poctime.product.domain.category.Category;
 import app.mkiniz.poctime.product.domain.category.CategoryEvent;
 import app.mkiniz.poctime.product.domain.taxdata.ProductTaxData;
+import app.mkiniz.poctime.product.domain.taxdata.ProductTaxEvent;
 import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
@@ -51,16 +52,12 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductTaxData> taxDataHistory;
 
-    /**
-     * Método auxiliar para obter os dados fiscais válidos para uma data específica.
-     */
     public Optional<ProductTaxData> getTaxDataForDate(LocalDate date) {
         if (Objects.isNull(taxDataHistory)) {
             return Optional.empty();
         }
         return taxDataHistory.stream()
-                .filter(tax -> !date.isBefore(tax.getValidFrom()) &&
-                        (tax.getValidUntil() == null || !date.isAfter(tax.getValidUntil())))
+                .filter(tax -> !tax.isBefore(date) && tax.isAfter(date))
                 .findFirst();
     }
 
@@ -74,6 +71,7 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
                         .description(this.description)
                         .sku(this.sku)
                         .category(CategoryEvent.from(this.category))
+                        .taxData(this.taxDataHistory != null ? this.taxDataHistory.stream().map(ProductTaxEvent::from).toList() : List.of())
                         .build());
     }
 
@@ -87,6 +85,7 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
                         .description(this.description)
                         .sku(this.sku)
                         .category(CategoryEvent.from(this.category))
+                        .taxData(this.taxDataHistory != null ? this.taxDataHistory.stream().map(ProductTaxEvent::from).toList() : List.of())
                         .build());
     }
 
@@ -100,6 +99,7 @@ public class Product extends AbstractAggregateRoot<Product> implements EntityCre
                         .description(this.description)
                         .sku(this.sku)
                         .category(CategoryEvent.from(this.category))
+                        .taxData(this.taxDataHistory != null ? this.taxDataHistory.stream().map(ProductTaxEvent::from).toList() : List.of())
                         .build());
     }
 }

@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.services;
+package app.mkiniz.poctime.product.services.base;
 
 import app.mkiniz.poctime.product.domain.Product;
 import app.mkiniz.poctime.product.domain.ProductRepository;

@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.services;
+package app.mkiniz.poctime.product.services.base;
 
 import app.mkiniz.poctime.product.domain.*;
 import app.mkiniz.poctime.product.domain.category.Category;

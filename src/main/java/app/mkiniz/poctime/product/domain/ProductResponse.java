@@ -12,4 +12,6 @@ public record ProductResponse(String id, String name, CategoryResponse category,
                 product.getDescription()
         );
     }
+
+
 }
