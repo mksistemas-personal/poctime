@@ -1,8 +1,11 @@
 package app.mkiniz.poctime.base.tax.ncm;
 
+import app.mkiniz.poctime.shared.business.BusinessException;
 import app.mkiniz.poctime.shared.repository.RedisRepository;
 import com.github.f4b6a3.tsid.Tsid;
+import cyclops.control.Either;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 class FillNCMServiceImpl implements FillNCMService {
 
     private final RedisRepository repository;
@@ -29,8 +34,42 @@ class FillNCMServiceImpl implements FillNCMService {
     @Value(NCMConstants.NCM_TENANT_VALUE)
     private String tenant;
 
+    @Value(NCMConstants.NCM_TIMEOUT_IN_SECONDS)
+    private int timeoutInSeconds;
+
     @Override
     public void execute() {
+        Either.<BusinessException, Context>right(new Context(Tsid.from(tenant)))
+                .flatMap(this::retrieveHeader)
+                .flatMap(this::verifyHeader)
+                .flatMap(this::loadNCMFromApi)
+                .flatMap(this::deleteOldNCMItems)
+                .flatMap(this::saveNCMItems)
+                .map(context ->
+                {
+                    log.debug("NCM filled successfully for tenant: {}", context.tenantCode);
+                    return context;
+                })
+                .fold(exception ->
+                {
+                    log.debug("Error filling NCM: {}", exception.getMessage());
+                    return exception;
+                }, context -> context);
+    }
+
+    private Either<BusinessException, Context> saveNCMItems(Context context) {
+        Map<String, Object> itemsMap = context.items.stream()
+                .collect(Collectors.toMap(NCMItem::code, item -> item));
+        repository.saveAll(context.tenantCode, NCMConstants.NCM_CATEGORY, itemsMap);
+        return Either.right(context);
+    }
+
+    private Either<BusinessException, Context> deleteOldNCMItems(Context context) {
+        repository.deleteAllByCategory(context.tenantCode, NCMConstants.NCM_CATEGORY);
+        return Either.right(context);
+    }
+
+    private Either<BusinessException, Context> loadNCMFromApi(Context context) {
         ResponseEntity<List<NCMItem>> response = restTemplate.exchange(
                 ncmUrl,
                 HttpMethod.GET,
@@ -38,17 +77,40 @@ class FillNCMServiceImpl implements FillNCMService {
                 new ParameterizedTypeReference<List<NCMItem>>() {
                 }
         );
-
-        List<NCMItem> items = response.getBody();
-        if (items == null || items.isEmpty()) {
-            return;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            context.items = response.getBody();
+            return Either.right(context);
+        } else {
+            log.error("NCM API error: {} - {}", response.getStatusCode(), response.getBody());
+            return Either.left(new BusinessException(NCMConstants.NCM_API_ERROR));
         }
+    }
 
-        Tsid tenantCode = Tsid.from(tenant);
-        repository.deleteAllByCategory(tenantCode, NCMConstants.NCM_CATEGORY);
+    private Either<BusinessException, Context> verifyHeader(Context context) {
+        LocalDateTime nextDateTime = context.ncmHeader.lastUpdate().plusSeconds(timeoutInSeconds);
+        return LocalDateTime.now().isBefore(nextDateTime) ?
+                Either.right(context) :
+                Either.left(new BusinessException(NCMConstants.NCM_TIMEOUT_NOT_REACHED));
+    }
 
-        Map<String, Object> itemsMap = items.stream()
-                .collect(Collectors.toMap(NCMItem::code, item -> item));
-        repository.saveAll(tenantCode, NCMConstants.NCM_CATEGORY, itemsMap);
+    private Either<BusinessException, Context> retrieveHeader(Context context) {
+        context.ncmHeader = repository.<NCMHeader>get(context.tenantCode, NCMConstants.NCM_CATEGORY, NCMConstants.NCM_HEADER)
+                .orElseGet(() ->
+                        new NCMHeader(
+                                LocalDateTime.now().minusSeconds(timeoutInSeconds),
+                                NCMConstants.NCM_VERSION));
+        return Either.right(context);
+
+    }
+
+    private static class Context {
+
+        public Tsid tenantCode;
+        public NCMHeader ncmHeader;
+        public List<NCMItem> items;
+
+        public Context(Tsid tenantCode) {
+            this.tenantCode = tenantCode;
+        }
     }
 }

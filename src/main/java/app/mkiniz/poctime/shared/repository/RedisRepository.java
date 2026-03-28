@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,9 +36,10 @@ public class RedisRepository {
     /**
      * Recupera um objeto do Redis pela chave composta.
      */
-    public Object get(Tsid tenantId, String category, String code) {
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> get(Tsid tenantId, String category, String code) {
         String key = buildKey(tenantId, category, code);
-        return redisTemplate.opsForValue().get(key);
+        return Optional.ofNullable((T) redisTemplate.opsForValue().get(key));
     }
 
     /**

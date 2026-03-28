@@ -50,3 +50,4 @@ poctime:
   ncm:
     url: https://portalunico.siscomex.gov.br/classif/api/publico/nomenclatura/download/json?perfil=PUBLICO
     tenant: 0px7wdx2f3dh0
+    timeoutInSeconds: 18000
