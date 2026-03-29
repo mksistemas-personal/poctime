@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +40,7 @@ class FillNCMServiceImpl implements FillNCMService {
     private int timeoutInSeconds;
 
     @Override
+    @Scheduled(fixedRate = 300000, initialDelay = 10000) // 5 minutos = 300.000 ms
     public void execute() {
         Either.<BusinessException, Context>right(new Context(Tsid.from(tenant)))
                 .flatMap(this::retrieveHeader)
@@ -61,6 +64,7 @@ class FillNCMServiceImpl implements FillNCMService {
         Map<String, Object> itemsMap = context.items.stream()
                 .collect(Collectors.toMap(NCMItem::code, item -> item));
         repository.saveAll(context.tenantCode, NCMConstants.NCM_CATEGORY, itemsMap);
+        repository.save(context.tenantCode, NCMConstants.NCM_CATEGORY, NCMConstants.NCM_HEADER, new NCMHeader(LocalDateTime.now(), NCMConstants.NCM_VERSION));
         return Either.right(context);
     }
 
@@ -70,15 +74,19 @@ class FillNCMServiceImpl implements FillNCMService {
     }
 
     private Either<BusinessException, Context> loadNCMFromApi(Context context) {
-        ResponseEntity<List<NCMItem>> response = restTemplate.exchange(
+        ResponseEntity<NCMApiHeader> response = restTemplate.exchange(
                 ncmUrl,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<NCMItem>>() {
+                new ParameterizedTypeReference<NCMApiHeader>() {
                 }
         );
         if (response.getStatusCode().is2xxSuccessful()) {
-            context.items = response.getBody();
+            context.items = response.getBody().items();
+            if (Objects.isNull(context.items) || context.items.isEmpty()) {
+                log.error("NCM API returned empty or null items list");
+                return Either.left(new BusinessException(NCMConstants.NCM_API_EMPTY_RESPONSE));
+            }
             return Either.right(context);
         } else {
             log.error("NCM API error: {} - {}", response.getStatusCode(), response.getBody());
@@ -88,19 +96,18 @@ class FillNCMServiceImpl implements FillNCMService {
 
     private Either<BusinessException, Context> verifyHeader(Context context) {
         LocalDateTime nextDateTime = context.ncmHeader.lastUpdate().plusSeconds(timeoutInSeconds);
-        return LocalDateTime.now().isBefore(nextDateTime) ?
+        return LocalDateTime.now().isAfter(nextDateTime) ?
                 Either.right(context) :
                 Either.left(new BusinessException(NCMConstants.NCM_TIMEOUT_NOT_REACHED));
     }
 
     private Either<BusinessException, Context> retrieveHeader(Context context) {
-        context.ncmHeader = repository.<NCMHeader>get(context.tenantCode, NCMConstants.NCM_CATEGORY, NCMConstants.NCM_HEADER)
+        context.ncmHeader = repository.<NCMHeader>get(context.tenantCode, NCMConstants.NCM_CATEGORY, NCMConstants.NCM_HEADER, NCMHeader.class)
                 .orElseGet(() ->
                         new NCMHeader(
                                 LocalDateTime.now().minusSeconds(timeoutInSeconds),
                                 NCMConstants.NCM_VERSION));
         return Either.right(context);
-
     }
 
     private static class Context {

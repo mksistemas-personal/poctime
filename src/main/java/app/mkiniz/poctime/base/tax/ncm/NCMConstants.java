@@ -10,4 +10,5 @@ public class NCMConstants {
 
     public static final String NCM_TIMEOUT_NOT_REACHED = "ncm.timeout.not.reached";
     public static final String NCM_API_ERROR = "ncm.api.error";
+    public static final String NCM_API_EMPTY_RESPONSE = "ncm.api.empty.response";
 }

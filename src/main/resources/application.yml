@@ -39,7 +39,10 @@ server:
 
 logging:
   level:
+    root: INFO
+    app.mkiniz.poctime.base.tax.ncm: DEBUG
     org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
+
 
 rabbitmq:
   dlx-exchange: dlx.poctime
