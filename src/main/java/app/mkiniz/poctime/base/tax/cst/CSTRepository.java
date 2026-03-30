@@ -19,7 +19,7 @@ import java.util.Optional;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class CSVRepository {
+public class CSTRepository {
 
     private final ObjectMapper objectMapper;
     private final ResourceLoader resourceLoader;

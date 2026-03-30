@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CSVRepositoryTest {
 
-    private CSVRepository csvRepository;
+    private CSTRepository csvRepository;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         ResourceLoader resourceLoader = new DefaultResourceLoader();
-        csvRepository = new CSVRepository(objectMapper, resourceLoader);
+        csvRepository = new CSTRepository(objectMapper, resourceLoader);
         csvRepository.loadCsv();
     }
 

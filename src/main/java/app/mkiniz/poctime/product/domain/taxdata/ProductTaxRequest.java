@@ -15,8 +15,12 @@ public record ProductTaxRequest(
         Tsid productId,
         @NotBlank(message = ProductConstants.NCM_NOT_BLANK)
         String ncm,
-        @NotBlank(message = ProductConstants.CST_NOT_BLANK)
-        String cest,
+        @NotBlank(message = ProductConstants.CST_IPI_NOT_BLANK)
+        String cstIpi,
+        @NotBlank(message = ProductConstants.CST_PIS_NOT_BLANK)
+        String cstPis,
+        @NotBlank(message = ProductConstants.CST_COFINS_NOT_BLANK)
+        String cstCofins,
         @NotBlank(message = ProductConstants.CFOP_NOT_BLANK)
         String cfop,
         ProductType productType,
@@ -32,7 +36,9 @@ public record ProductTaxRequest(
                 .id(taxData.getId() != null ? Tsid.from(taxData.getId()) : null)
                 .productId(Tsid.from(taxData.getProduct().getId()))
                 .ncm(taxData.getNcm())
-                .cest(taxData.getCest())
+                .cstIpi(taxData.getCstIpi())
+                .cstPis(taxData.getCstPis())
+                .cstCofins(taxData.getCstCofins())
                 .cfop(taxData.getCfop())
                 .productType(taxData.getProductType())
                 .origin(taxData.getOrigin())

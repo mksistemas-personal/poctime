@@ -31,8 +31,14 @@ public class ProductTaxData {
     @Column(name = "ncm", length = 8)
     private String ncm;
 
-    @Column(name = "cest", length = 7)
-    private String cest;
+    @Column(name = "cst_ipi", length = 2)
+    private String cstIpi;
+
+    @Column(name = "cst_pis", length = 2)
+    private String cstPis;
+
+    @Column(name = "cst_cofins", length = 2)
+    private String cstCofins;
 
     @Column(name = "cfop", length = 4)
     private String cfop;
@@ -64,11 +70,15 @@ public class ProductTaxData {
             return Either.left(new BusinessException(ProductConstants.PRODUCT_NOT_NULL));
         if (StringUtils.isBlank(ncm))
             return Either.left(new BusinessException(ProductConstants.NCM_NOT_BLANK));
-        if (StringUtils.isBlank(cest))
-            return Either.left(new BusinessException(ProductConstants.CST_NOT_BLANK));
+        if (StringUtils.isBlank(cstIpi))
+            return Either.left(new BusinessException(ProductConstants.CST_IPI_NOT_BLANK));
+        if (StringUtils.isBlank(cstPis))
+            return Either.left(new BusinessException(ProductConstants.CST_PIS_NOT_BLANK));
+        if (StringUtils.isBlank(cstCofins))
+            return Either.left(new BusinessException(ProductConstants.CST_COFINS_NOT_BLANK));
         if (StringUtils.isBlank(cfop))
             return Either.left(new BusinessException(ProductConstants.CFOP_NOT_BLANK));
-        
+
         return Either.right(this);
     }
 

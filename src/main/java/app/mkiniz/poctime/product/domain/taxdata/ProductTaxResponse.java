@@ -9,7 +9,9 @@ import java.time.LocalDate;
 public record ProductTaxResponse(
         Tsid id,
         String ncm,
-        String cest,
+        String cstIpi,
+        String cstPis,
+        String cstCofins,
         String cfop,
         ProductType productType,
         GoodsOrigin origin,
@@ -23,7 +25,9 @@ public record ProductTaxResponse(
         return ProductTaxResponse.builder()
                 .id(taxData.getId() != null ? Tsid.from(taxData.getId()) : null)
                 .ncm(taxData.getNcm())
-                .cest(taxData.getCest())
+                .cstIpi(taxData.getCstIpi())
+                .cstPis(taxData.getCstPis())
+                .cstCofins(taxData.getCstCofins())
                 .cfop(taxData.getCfop())
                 .productType(taxData.getProductType())
                 .origin(taxData.getOrigin())

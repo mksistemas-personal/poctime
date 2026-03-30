@@ -1,5 +1,7 @@
 package app.mkiniz.poctime.product.services.tax;
 
+import app.mkiniz.poctime.base.tax.cfop.CFOPRepository;
+import app.mkiniz.poctime.base.tax.cst.CSTRepository;
 import app.mkiniz.poctime.base.tax.ncm.NCMService;
 import app.mkiniz.poctime.product.ProductConstants;
 import app.mkiniz.poctime.product.domain.Product;
@@ -29,6 +31,8 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
     private final ProductRepository productRepository;
     private final TsidGenerator tsidGenerator;
     private final NCMService ncmService;
+    private final CSTRepository csvRepository;
+    private final CFOPRepository cfopRepository;
 
     @Override
     public ProductTaxResponse execute(ProductTaxRequest request) {
@@ -47,6 +51,22 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
                 .flatMap(ctx -> {
                     if (ncmService.findByCode(ctx.request.ncm()).isEmpty())
                         return Either.left(new BusinessException(ProductConstants.NCM_NOT_FOUND));
+                    return Either.right(ctx);
+                })
+                .flatMap(ctx -> {
+                    if (csvRepository.findIpiByCode(ctx.request.cstIpi()).isEmpty())
+                        return Either.left(new BusinessException(ProductConstants.CST_IPI_NOT_FOUND));
+
+                    if (csvRepository.findPisByCode(ctx.request.cstPis()).isEmpty())
+                        return Either.left(new BusinessException(ProductConstants.CST_PIS_NOT_FOUND));
+
+                    if (csvRepository.findCofinsByCode(ctx.request.cstCofins()).isEmpty())
+                        return Either.left(new BusinessException(ProductConstants.CST_COFINS_NOT_FOUND));
+                    return Either.right(ctx);
+                })
+                .flatMap(ctx -> {
+                    if (cfopRepository.findByCode(ctx.request.cfop()).isEmpty())
+                        return Either.left(new BusinessException(ProductConstants.CFOP_NOT_FOUND));
                     return Either.right(ctx);
                 });
     }
@@ -73,7 +93,9 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
                 .id(tsidGenerator.newIdAsLong())
                 .product(context.product)
                 .ncm(context.request.ncm())
-                .cest(context.request.cest())
+                .cstIpi(context.request.cstIpi())
+                .cstPis(context.request.cstPis())
+                .cstCofins(context.request.cstCofins())
                 .cfop(context.request.cfop())
                 .productType(context.request.productType())
                 .origin(context.request.origin())
