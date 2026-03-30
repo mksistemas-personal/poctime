@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.product.services.tax;
 
+import app.mkiniz.poctime.base.tax.cfop.CFOPRepository;
 import app.mkiniz.poctime.base.tax.cst.CSTRepository;
 import app.mkiniz.poctime.base.tax.ncm.NCMItem;
 import app.mkiniz.poctime.base.tax.ncm.NCMService;
@@ -23,7 +24,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +35,7 @@ class AddProductTaxServiceTest {
     private TsidGenerator tsidGenerator;
     private NCMService ncmService;
     private CSTRepository csvRepository;
+    private CFOPRepository cfopRepository;
 
     private AddProductTaxService addProductTaxService;
 
@@ -48,13 +50,16 @@ class AddProductTaxServiceTest {
         tsidGenerator = new TsidGenerator();
         csvRepository = new CSTRepository(new ObjectMapper(), new DefaultResourceLoader());
         csvRepository.loadCsv();
+        cfopRepository = new CFOPRepository(new ObjectMapper(), new DefaultResourceLoader());
+        cfopRepository.loadCfops();
 
         addProductTaxService = new AddProductTaxService(
                 productTaxDataRepository,
                 productRepository,
                 tsidGenerator,
                 ncmService,
-                csvRepository
+                csvRepository,
+                cfopRepository
         );
 
         Tsid productId = Tsid.fast();
@@ -85,7 +90,41 @@ class AddProductTaxServiceTest {
         assertEquals("00", response.cstIpi());
         assertEquals("01", response.cstPis());
         assertEquals("01", response.cstCofins());
-        verify(productTaxDataRepository).save(any(ProductTaxData.class));
+        verify(productTaxDataRepository, atLeastOnce()).save(any(ProductTaxData.class));
+    }
+
+    @Test
+    void shouldCloseOldTaxDataWhenAddingNewOne() {
+        ProductTaxData oldTaxData = ProductTaxData.builder()
+                .id(1L)
+                .product(product)
+                .ncm("00000000")
+                .validFrom(java.time.LocalDate.now().minusDays(10))
+                .validUntil(null)
+                .build();
+
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+        when(productTaxDataRepository.findFirstByProductAndValidUntilIsNull(product)).thenReturn(Optional.of(oldTaxData));
+        when(ncmService.findByCode("12345678")).thenReturn(Optional.of(new NCMItem("12345678", "Desc", "2024-01-01", "", "Ato", "1", "2024")));
+        when(productTaxDataRepository.save(any(ProductTaxData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        java.time.LocalDate newValidFrom = java.time.LocalDate.now();
+        request = ProductTaxRequest.builder()
+                .id(Tsid.from(product.getId()))
+                .productId(Tsid.from(product.getId()))
+                .ncm("12345678")
+                .cstIpi("00")
+                .cstPis("01")
+                .cstCofins("01")
+                .cfop("5102")
+                .validFrom(newValidFrom)
+                .build();
+
+        addProductTaxService.execute(request);
+
+        assertEquals(newValidFrom, oldTaxData.getValidUntil());
+        verify(productTaxDataRepository).save(oldTaxData);
+        verify(productTaxDataRepository).save(argThat(tax -> tax.getValidFrom().equals(newValidFrom)));
     }
 
     @Test
@@ -103,6 +142,6 @@ class AddProductTaxServiceTest {
                 .build();
 
         BusinessException exception = assertThrows(BusinessException.class, () -> addProductTaxService.execute(request));
-        assertEquals(ProductConstants.CST_NOT_FOUND, exception.getMessage());
+        assertEquals(ProductConstants.CST_IPI_NOT_FOUND, exception.getMessage());
     }
 }

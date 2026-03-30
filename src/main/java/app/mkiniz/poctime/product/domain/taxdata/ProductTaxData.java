@@ -78,7 +78,10 @@ public class ProductTaxData {
             return Either.left(new BusinessException(ProductConstants.CST_COFINS_NOT_BLANK));
         if (StringUtils.isBlank(cfop))
             return Either.left(new BusinessException(ProductConstants.CFOP_NOT_BLANK));
-
+        if (Objects.isNull(validFrom))
+            return Either.left(new BusinessException(ProductConstants.VALID_FROM_NOT_NULL));
+        if (Objects.nonNull(validUntil))
+            return Either.left(new BusinessException(ProductConstants.VALID_UNTIL_MOST_BE_NULL));
         return Either.right(this);
     }
 

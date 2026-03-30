@@ -38,11 +38,21 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
     public ProductTaxResponse execute(ProductTaxRequest request) {
         return (ProductTaxResponse) createContext(request)
                 .flatMap(this::findProduct)
+                .flatMap(this::closePreviousTaxData)
                 .flatMap(this::createTaxData)
                 .flatMap(this::validateTaxBusiness)
                 .flatMap(this::saveTaxData)
                 .map(context -> ProductTaxResponse.from(context.taxData))
                 .fold(this::throwBusinessException, response -> response);
+    }
+
+    private Either<BusinessException, Context> closePreviousTaxData(Context context) {
+        productTaxDataRepository.findFirstByProductAndValidUntilIsNull(context.product)
+                .ifPresent(oldTaxData -> {
+                    oldTaxData.setValidUntil(context.request.validFrom());
+                    productTaxDataRepository.save(oldTaxData);
+                });
+        return Either.right(context);
     }
 
     private Either<BusinessException, Context> validateTaxBusiness(Context context) {
@@ -67,6 +77,15 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
                 .flatMap(ctx -> {
                     if (cfopRepository.findByCode(ctx.request.cfop()).isEmpty())
                         return Either.left(new BusinessException(ProductConstants.CFOP_NOT_FOUND));
+                    return Either.right(ctx);
+                })
+                .flatMap(ctx -> {
+                    Optional<ProductTaxData> previousTax = productTaxDataRepository.findFirstByProductAndValidUntilIsNull(ctx.product);
+                    if (previousTax.isPresent()) {
+                        ProductTaxData value = previousTax.get();
+                        context.previousTax = value;
+
+                    }
                     return Either.right(ctx);
                 });
     }
@@ -118,6 +137,7 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
         public final ProductTaxRequest request;
         public Product product;
         public ProductTaxData taxData;
+        public ProductTaxData previousTax;
 
         private Context(ProductTaxRequest request) {
             this.request = request;

@@ -20,6 +20,8 @@ public class ProductConstants {
     public static final String CST_PIS_NOT_FOUND = "cst.pis.not.found";
     public static final String CST_COFINS_NOT_FOUND = "cst.cofins.not.found";
     public static final String CFOP_NOT_FOUND = "cfop.not.found";
+    public static final String VALID_UNTIL_MOST_BE_NULL = "valid.until.most.be.null";
+    public static final String VALID_FROM_NOT_NULL = "valid.from.not.null";
 
     // RABBITMQ CONSTANTS
     public static final String PRODUCT_INPUT_EXCHANGE = "exchange.in.product";
