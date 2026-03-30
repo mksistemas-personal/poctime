@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.product.services.tax;
 
+import app.mkiniz.poctime.base.tax.ncm.NCMService;
 import app.mkiniz.poctime.product.ProductConstants;
 import app.mkiniz.poctime.product.domain.Product;
 import app.mkiniz.poctime.product.domain.ProductRepository;
@@ -27,15 +28,27 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
     private final ProductTaxDataRepository productTaxDataRepository;
     private final ProductRepository productRepository;
     private final TsidGenerator tsidGenerator;
+    private final NCMService ncmService;
 
     @Override
     public ProductTaxResponse execute(ProductTaxRequest request) {
         return (ProductTaxResponse) createContext(request)
                 .flatMap(this::findProduct)
                 .flatMap(this::createTaxData)
+                .flatMap(this::validateTaxBusiness)
                 .flatMap(this::saveTaxData)
                 .map(context -> ProductTaxResponse.from(context.taxData))
                 .fold(this::throwBusinessException, response -> response);
+    }
+
+    private Either<BusinessException, Context> validateTaxBusiness(Context context) {
+        return context.taxData.valid()
+                .map(taxData -> context)
+                .flatMap(ctx -> {
+                    if (ncmService.findByCode(ctx.request.ncm()).isEmpty())
+                        return Either.left(new BusinessException(ProductConstants.NCM_NOT_FOUND));
+                    return Either.right(ctx);
+                });
     }
 
     private Either<BusinessException, Context> createContext(ProductTaxRequest request) {

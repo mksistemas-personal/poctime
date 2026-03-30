@@ -19,13 +19,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-class FillNCMServiceImpl implements FillNCMService {
+class NCMServiceImpl implements NCMService {
 
     private final RedisRepository repository;
     private final RestTemplate restTemplate;
@@ -41,7 +42,7 @@ class FillNCMServiceImpl implements FillNCMService {
 
     @Override
     @Scheduled(fixedRate = 300000, initialDelay = 10000) // 5 minutos = 300.000 ms
-    public void execute() {
+    public void fillRepository() {
         Either.<BusinessException, Context>right(new Context(Tsid.from(tenant)))
                 .flatMap(this::retrieveHeader)
                 .flatMap(this::verifyHeader)
@@ -58,6 +59,11 @@ class FillNCMServiceImpl implements FillNCMService {
                     log.debug("Error filling NCM: {}", exception.getMessage());
                     return exception;
                 }, context -> context);
+    }
+
+    @Override
+    public Optional<NCMItem> findByCode(String code) {
+        return repository.get(Tsid.from(tenant), NCMConstants.NCM_CATEGORY, code, NCMItem.class);
     }
 
     private Either<BusinessException, Context> saveNCMItems(Context context) {

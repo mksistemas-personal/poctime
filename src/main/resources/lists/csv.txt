@@ -1,0 +1,80 @@
+1,00,Entrada com Recuperação de Crédito
+1,01,Entrada Tributável com Alíquota Zero
+1,02,Entrada Isenta
+1,03,Entrada Não-Tributada
+1,04,Entrada Imune
+1,05,Entrada com Suspensão
+1,49,Outras Entradas
+1,50,Saída Tributada
+1,51,Saída Tributável com Alíquota Zero
+1,52,Saída Isenta
+1,53,Saída Não-Tributada
+1,54,Saída Imune
+1,55,Saída com Suspensão
+1,99,Outras Saídas
+2,01,Operação Tributável com Alíquota Básica
+2,02,Operação Tributável com Alíquota Diferenciada
+2,03,Operação Tributável com Alíquota por Unidade de Medida de Produto
+2,04,Operação Tributável Monofásica - Revenda a Alíquota Zero
+2,05,Operação Tributável por Substituição Tributária
+2,06,Operação Tributável a Alíquota Zero
+2,07,Operação Isenta da Contribuição
+2,08,Operação sem Incidência da Contribuição
+2,09,Operação com Suspensão da Contribuição
+2,49,Outras Operações de Saída
+2,50,Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Tributada no Mercado Interno
+2,51,Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Não Tributada no Mercado Interno
+2,52,Operação com Direito a Crédito - Vinculada Exclusivamente a Receita de Exportação
+2,53,Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno
+2,54,Operação com Direito a Crédito - Vinculada a Receitas Tributadas no Mercado Interno e de Exportação
+2,55,Operação com Direito a Crédito - Vinculada a Receitas Não-Tributadas no Mercado Interno e de Exportação
+2,56,Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno, e de Exportação
+2,60,Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Tributada no Mercado Interno
+2,61,Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Não-Tributada no Mercado Interno
+2,62,Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita de Exportação
+2,63,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno
+2,64,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas no Mercado Interno e de Exportação
+2,65,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Não-Tributadas no Mercado Interno e de Exportação
+2,66,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno, e de Exportação
+2,67,Crédito Presumido - Outras Operações
+2,70,Operação de Aquisição sem Direito a Crédito
+2,71,Operação de Aquisição com Isenção
+2,72,Operação de Aquisição com Suspensão
+2,73,Operação de Aquisição a Alíquota Zero
+2,74,Operação de Aquisição sem Incidência da Contribuição
+2,75,Operação de Aquisição por Substituição Tributária
+2,98,Outras Operações de Entrada
+2,99,Outras Operações
+3,01,Operação Tributável com Alíquota Básica
+3,02,Operação Tributável com Alíquota Diferenciada
+3,03,Operação Tributável com Alíquota por Unidade de Medida de Produto
+3,04,Operação Tributável Monofásica - Revenda a Alíquota Zero
+3,05,Operação Tributável por Substituição Tributária
+3,06,Operação Tributável a Alíquota Zero
+3,07,Operação Isenta da Contribuição
+3,08,Operação sem Incidência da Contribuição
+3,09,Operação com Suspensão da Contribuição
+3,49,Outras Operações de Saída
+3,50,Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Tributada no Mercado Interno
+3,51,Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Não-Tributada no Mercado Interno
+3,52,Operação com Direito a Crédito - Vinculada Exclusivamente a Receita de Exportação
+3,53,Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno
+3,54,Operação com Direito a Crédito - Vinculada a Receitas Tributadas no Mercado Interno e de Exportação
+3,55,Operação com Direito a Crédito - Vinculada a Receitas Não Tributadas no Mercado Interno e de Exportação
+3,56,Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno e de Exportação
+3,60,Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Tributada no Mercado Interno
+3,61,Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Não-Tributada no Mercado Interno
+3,62,Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita de Exportação
+3,63,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno
+3,64,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas no Mercado Interno e de Exportação
+3,65,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Não-Tributadas no Mercado Interno e de Exportação
+3,66,Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno e de Exportação
+3,67,Crédito Presumido - Outras Operações
+3,70,Operação de Aquisição sem Direito a Crédito
+3,71,Operação de Aquisição com Isenção
+3,72,Operação de Aquisição com Suspensão
+3,73,Operação de Aquisição a Alíquota Zero
+3,74,Operação de Aquisição sem Incidência da Contribuição
+3,75,Operação de Aquisição por Substituição Tributária
+3,98,Outras Operações de Entrada
+3,99,Outras Operações
