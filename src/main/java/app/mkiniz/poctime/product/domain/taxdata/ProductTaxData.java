@@ -28,30 +28,30 @@ public class ProductTaxData {
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(name = "fk_tax_data_product"))
     private Product product;
 
-    @Column(name = "ncm", length = 8)
+    @Column(name = "ncm", length = 8, nullable = false)
     private String ncm;
 
-    @Column(name = "cst_ipi", length = 2)
+    @Column(name = "cst_ipi", length = 2, nullable = false)
     private String cstIpi;
 
-    @Column(name = "cst_pis", length = 2)
+    @Column(name = "cst_pis", length = 2, nullable = false)
     private String cstPis;
 
-    @Column(name = "cst_cofins", length = 2)
+    @Column(name = "cst_cofins", length = 2, nullable = false)
     private String cstCofins;
 
-    @Column(name = "cfop", length = 4)
+    @Column(name = "cfop", length = 4, nullable = false)
     private String cfop;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "product_type")
+    @Column(name = "product_type", nullable = false)
     private ProductType productType;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "origin")
+    @Column(name = "origin", nullable = false)
     private GoodsOrigin origin;
 
-    @Column(name = "valid_from")
+    @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
 
     @Column(name = "valid_until")
@@ -83,6 +83,14 @@ public class ProductTaxData {
         if (Objects.nonNull(validUntil))
             return Either.left(new BusinessException(ProductConstants.VALID_UNTIL_MOST_BE_NULL));
         return Either.right(this);
+    }
+
+    public boolean validFromAndUntil(ProductTaxData previousTax) {
+        if (Objects.nonNull(previousTax)) {
+            if (previousTax.validFrom.isEqual(validFrom) || previousTax.validFrom.isAfter(validFrom))
+                return false;
+        }
+        return true;
     }
 
 }

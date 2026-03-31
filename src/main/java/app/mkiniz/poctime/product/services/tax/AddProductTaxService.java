@@ -81,11 +81,10 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
                 })
                 .flatMap(ctx -> {
                     Optional<ProductTaxData> previousTax = productTaxDataRepository.findFirstByProductAndValidUntilIsNull(ctx.product);
-                    if (previousTax.isPresent()) {
-                        ProductTaxData value = previousTax.get();
-                        context.previousTax = value;
-
+                    if (previousTax.isPresent() && context.taxData.validFromAndUntil(previousTax.get())) {
+                        return Either.left(new BusinessException(ProductConstants.VALID_FROM_SMALLER_THAN_LAST_VALUE));
                     }
+                    previousTax.ifPresent(value -> ctx.previousTax = value);
                     return Either.right(ctx);
                 });
     }
@@ -125,11 +124,11 @@ public class AddProductTaxService implements AddBusinessUseCase<ProductTaxReques
     }
 
     private Either<BusinessException, Context> saveTaxData(Context context) {
+        if (Objects.nonNull(context.previousTax)) {
+            context.previousTax.setValidUntil(context.request.validFrom().minusDays(1));
+            context.previousTax = productTaxDataRepository.save(context.previousTax);
+        }
         context.taxData = productTaxDataRepository.save(context.taxData);
-        // Opcional: registrar evento no produto se necessário, mas ProductTaxData parece ser uma entidade independente aqui.
-        // Se quisermos disparar o evento de atualização do produto:
-        // context.product.updated();
-        // productRepository.save(context.product);
         return Either.right(context);
     }
 

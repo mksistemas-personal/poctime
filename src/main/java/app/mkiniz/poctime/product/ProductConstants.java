@@ -12,7 +12,6 @@ public class ProductConstants {
     public static final String CST_IPI_NOT_BLANK = "product.cst.ipi.not.blank";
     public static final String CST_PIS_NOT_BLANK = "product.cst.pis.not.blank";
     public static final String CST_COFINS_NOT_BLANK = "product.cst.cofins.not.blank";
-    public static final String CST_NOT_FOUND = "product.cst.not.found";
     public static final String CFOP_NOT_BLANK = "product.cfop.not.blank";
     public static final String REQUEST_TAX_NOT_NULL = "product.tax.request.not.null";
     public static final String NCM_NOT_FOUND = "product.ncm.not.found";
@@ -20,8 +19,9 @@ public class ProductConstants {
     public static final String CST_PIS_NOT_FOUND = "cst.pis.not.found";
     public static final String CST_COFINS_NOT_FOUND = "cst.cofins.not.found";
     public static final String CFOP_NOT_FOUND = "cfop.not.found";
-    public static final String VALID_UNTIL_MOST_BE_NULL = "valid.until.most.be.null";
     public static final String VALID_FROM_NOT_NULL = "valid.from.not.null";
+    public static final String VALID_FROM_SMALLER_THAN_LAST_VALUE = "valid.from.smaller.than.last.value";
+    public static final String VALID_UNTIL_MOST_BE_NULL = "valid.until.most.be.null";
 
     // RABBITMQ CONSTANTS
     public static final String PRODUCT_INPUT_EXCHANGE = "exchange.in.product";
