@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.domain.taxdata;
+package app.mkiniz.poctime.product.domain.tax;
 
 public enum GoodsOrigin {
     NATIONAL,

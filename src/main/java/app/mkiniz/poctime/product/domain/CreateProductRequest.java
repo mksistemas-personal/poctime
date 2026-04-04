@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateProductRequest(
-        @NotBlank(message = ProductConstants.NAME_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_NAME_NOT_BLANK)
         String name,
         @Valid
         @NotNull(message = ProductConstants.CATEGORY_NOT_NULL)
         CategoryRequest category,
-        @NotBlank(message = ProductConstants.SKU_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_SKU_NOT_BLANK)
         String sku,
         String description) {
 

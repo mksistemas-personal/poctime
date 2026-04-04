@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.domain.taxdata;
+package app.mkiniz.poctime.product.domain.tax;
 
 import app.mkiniz.poctime.product.ProductConstants;
 import app.mkiniz.poctime.product.domain.Product;
@@ -28,7 +28,7 @@ public class ProductTaxData {
     @JoinColumn(name = "product_id", nullable = false, foreignKey = @ForeignKey(name = "fk_tax_data_product"))
     private Product product;
 
-    @Column(name = "ncm", length = 8, nullable = false)
+    @Column(name = "ncm", length = 10, nullable = false)
     private String ncm;
 
     @Column(name = "cst_ipi", length = 2, nullable = false)
@@ -69,26 +69,25 @@ public class ProductTaxData {
         if (Objects.isNull(product))
             return Either.left(new BusinessException(ProductConstants.PRODUCT_NOT_NULL));
         if (StringUtils.isBlank(ncm))
-            return Either.left(new BusinessException(ProductConstants.NCM_NOT_BLANK));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_NCM_NOT_BLANK));
         if (StringUtils.isBlank(cstIpi))
-            return Either.left(new BusinessException(ProductConstants.CST_IPI_NOT_BLANK));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_CST_IPI_NOT_BLANK));
         if (StringUtils.isBlank(cstPis))
-            return Either.left(new BusinessException(ProductConstants.CST_PIS_NOT_BLANK));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_CST_PIS_NOT_BLANK));
         if (StringUtils.isBlank(cstCofins))
-            return Either.left(new BusinessException(ProductConstants.CST_COFINS_NOT_BLANK));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_CST_COFINS_NOT_BLANK));
         if (StringUtils.isBlank(cfop))
-            return Either.left(new BusinessException(ProductConstants.CFOP_NOT_BLANK));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_CFOP_NOT_BLANK));
         if (Objects.isNull(validFrom))
-            return Either.left(new BusinessException(ProductConstants.VALID_FROM_NOT_NULL));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_VALID_FROM_NOT_NULL));
         if (Objects.nonNull(validUntil))
-            return Either.left(new BusinessException(ProductConstants.VALID_UNTIL_MOST_BE_NULL));
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_VALID_UNTIL_MOST_BE_NULL));
         return Either.right(this);
     }
 
     public boolean validFromAndUntil(ProductTaxData previousTax) {
         if (Objects.nonNull(previousTax)) {
-            if (previousTax.validFrom.isEqual(validFrom) || previousTax.validFrom.isAfter(validFrom))
-                return false;
+            return validFrom.isAfter(previousTax.validFrom);
         }
         return true;
     }

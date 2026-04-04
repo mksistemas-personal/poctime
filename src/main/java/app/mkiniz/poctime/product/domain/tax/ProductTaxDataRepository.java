@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.domain.taxdata;
+package app.mkiniz.poctime.product.domain.tax;
 
 import app.mkiniz.poctime.product.domain.Product;
 import org.springframework.data.jpa.repository.JpaRepository;

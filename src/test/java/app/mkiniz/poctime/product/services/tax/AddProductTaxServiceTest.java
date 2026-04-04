@@ -7,10 +7,10 @@ import app.mkiniz.poctime.base.tax.ncm.NCMService;
 import app.mkiniz.poctime.product.ProductConstants;
 import app.mkiniz.poctime.product.domain.Product;
 import app.mkiniz.poctime.product.domain.ProductRepository;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxData;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxDataRepository;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxRequest;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxResponse;
+import app.mkiniz.poctime.product.domain.tax.CreateProductTaxRequest;
+import app.mkiniz.poctime.product.domain.tax.ProductTaxData;
+import app.mkiniz.poctime.product.domain.tax.ProductTaxDataRepository;
+import app.mkiniz.poctime.product.domain.tax.ProductTaxResponse;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +40,7 @@ class AddProductTaxServiceTest {
     private AddProductTaxService addProductTaxService;
 
     private Product product;
-    private ProductTaxRequest request;
+    private CreateProductTaxRequest request;
 
     @BeforeEach
     void setUp() {
@@ -66,7 +66,7 @@ class AddProductTaxServiceTest {
         product = new Product();
         product.setId(productId.toLong());
 
-        request = ProductTaxRequest.builder()
+        request = CreateProductTaxRequest.builder()
                 .id(productId)
                 .productId(productId)
                 .ncm("12345678")
@@ -109,7 +109,7 @@ class AddProductTaxServiceTest {
         when(productTaxDataRepository.save(any(ProductTaxData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         java.time.LocalDate newValidFrom = java.time.LocalDate.now();
-        request = ProductTaxRequest.builder()
+        request = CreateProductTaxRequest.builder()
                 .id(Tsid.from(product.getId()))
                 .productId(Tsid.from(product.getId()))
                 .ncm("12345678")
@@ -131,7 +131,7 @@ class AddProductTaxServiceTest {
     void shouldThrowExceptionWhenCstIpiNotFound() {
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
         when(ncmService.findByCode("12345678")).thenReturn(Optional.of(new NCMItem("12345678", "Desc", "2024-01-01", "", "Ato", "1", "2024")));
-        request = ProductTaxRequest.builder()
+        request = CreateProductTaxRequest.builder()
                 .id(Tsid.fast())
                 .productId(Tsid.fast())
                 .ncm("12345678")
@@ -142,6 +142,6 @@ class AddProductTaxServiceTest {
                 .build();
 
         BusinessException exception = assertThrows(BusinessException.class, () -> addProductTaxService.execute(request));
-        assertEquals(ProductConstants.CST_IPI_NOT_FOUND, exception.getMessage());
+        assertEquals(ProductConstants.PRODUCT_TAX_CST_IPI_NOT_FOUND, exception.getMessage());
     }
 }

@@ -1,7 +1,7 @@
 package app.mkiniz.poctime.product.adapters;
 
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxRequest;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxResponse;
+import app.mkiniz.poctime.product.domain.tax.CreateProductTaxRequest;
+import app.mkiniz.poctime.product.domain.tax.ProductTaxResponse;
 import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class ProductTaxController {
 
-    private final AddBusinessUseCase<ProductTaxRequest, ProductTaxResponse> addProductTaxService;
+    private final AddBusinessUseCase<CreateProductTaxRequest, ProductTaxResponse> addProductTaxService;
 
     @PostMapping
-    public ResponseEntity<ProductTaxResponse> createProduct(@Valid @RequestBody ProductTaxRequest request) {
+    public ResponseEntity<ProductTaxResponse> createProduct(@Valid @RequestBody CreateProductTaxRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addProductTaxService.execute(request));
     }
 }

@@ -2,8 +2,8 @@ package app.mkiniz.poctime.product.domain;
 
 import app.mkiniz.poctime.product.domain.category.Category;
 import app.mkiniz.poctime.product.domain.category.CategoryEvent;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxData;
-import app.mkiniz.poctime.product.domain.taxdata.ProductTaxEvent;
+import app.mkiniz.poctime.product.domain.tax.ProductTaxData;
+import app.mkiniz.poctime.product.domain.tax.ProductTaxEvent;
 import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;

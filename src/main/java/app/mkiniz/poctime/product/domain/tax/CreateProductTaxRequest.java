@@ -1,4 +1,4 @@
-package app.mkiniz.poctime.product.domain.taxdata;
+package app.mkiniz.poctime.product.domain.tax;
 
 import app.mkiniz.poctime.product.ProductConstants;
 import com.github.f4b6a3.tsid.Tsid;
@@ -9,30 +9,30 @@ import lombok.Builder;
 import java.time.LocalDate;
 
 @Builder
-public record ProductTaxRequest(
+public record CreateProductTaxRequest(
         Tsid id,
         @NotNull(message = ProductConstants.PRODUCT_NOT_NULL)
         Tsid productId,
-        @NotBlank(message = ProductConstants.NCM_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_TAX_NCM_NOT_BLANK)
         String ncm,
-        @NotBlank(message = ProductConstants.CST_IPI_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_TAX_CST_IPI_NOT_BLANK)
         String cstIpi,
-        @NotBlank(message = ProductConstants.CST_PIS_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_TAX_CST_PIS_NOT_BLANK)
         String cstPis,
-        @NotBlank(message = ProductConstants.CST_COFINS_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_TAX_CST_COFINS_NOT_BLANK)
         String cstCofins,
-        @NotBlank(message = ProductConstants.CFOP_NOT_BLANK)
+        @NotBlank(message = ProductConstants.PRODUCT_TAX_CFOP_NOT_BLANK)
         String cfop,
         ProductType productType,
         GoodsOrigin origin,
         LocalDate validFrom,
         LocalDate validUntil
 ) {
-    public static ProductTaxRequest from(ProductTaxData taxData) {
+    public static CreateProductTaxRequest from(ProductTaxData taxData) {
         if (taxData == null) {
             return null;
         }
-        return ProductTaxRequest.builder()
+        return CreateProductTaxRequest.builder()
                 .id(taxData.getId() != null ? Tsid.from(taxData.getId()) : null)
                 .productId(Tsid.from(taxData.getProduct().getId()))
                 .ncm(taxData.getNcm())

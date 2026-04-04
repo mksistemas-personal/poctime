@@ -4,53 +4,45 @@ import app.mkiniz.poctime.base.tax.cfop.CFOPRepository;
 import app.mkiniz.poctime.base.tax.cst.CSTRepository;
 import app.mkiniz.poctime.base.tax.ncm.NCMService;
 import app.mkiniz.poctime.product.ProductConstants;
-import app.mkiniz.poctime.product.domain.Product;
-import app.mkiniz.poctime.product.domain.ProductRepository;
-import app.mkiniz.poctime.product.domain.tax.CreateProductTaxRequest;
 import app.mkiniz.poctime.product.domain.tax.ProductTaxData;
 import app.mkiniz.poctime.product.domain.tax.ProductTaxDataRepository;
 import app.mkiniz.poctime.product.domain.tax.ProductTaxResponse;
+import app.mkiniz.poctime.product.domain.tax.UpdateProductTaxRequest;
 import app.mkiniz.poctime.product.services.ServiceDefaults;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
-import app.mkiniz.poctime.shared.business.AddBusinessUseCase;
 import app.mkiniz.poctime.shared.business.BusinessException;
+import app.mkiniz.poctime.shared.business.UpdateBusinessUseCase;
+import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Either;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @Transactional
 @AllArgsConstructor
-public class AddProductTaxService implements AddBusinessUseCase<CreateProductTaxRequest, ProductTaxResponse>, ServiceDefaults {
+public class UpdateProductTaxService implements UpdateBusinessUseCase<Tsid, UpdateProductTaxRequest, ProductTaxResponse>, ServiceDefaults {
 
     private final ProductTaxDataRepository productTaxDataRepository;
-    private final ProductRepository productRepository;
     private final TsidGenerator tsidGenerator;
     private final NCMService ncmService;
     private final CSTRepository csvRepository;
     private final CFOPRepository cfopRepository;
 
     @Override
-    public ProductTaxResponse execute(CreateProductTaxRequest request) {
+    public ProductTaxResponse execute(Tsid id, UpdateProductTaxRequest request) {
         return (ProductTaxResponse) createContext(request)
-                .flatMap(this::findProduct)
-                .flatMap(this::getPreviousTaxData)
-                .flatMap(this::createTaxData)
+                .flatMap(this::findProductTax)
+                .flatMap(this::updateTaxData)
                 .flatMap(this::validateTaxBusiness)
                 .flatMap(this::saveTaxData)
                 .map(context -> ProductTaxResponse.from(context.taxData))
                 .fold(this::throwBusinessException, response -> response);
-    }
-
-    private Either<BusinessException, Context> getPreviousTaxData(Context context) {
-        productTaxDataRepository.findFirstByProductAndValidUntilIsNull(context.product)
-                .ifPresent(value -> context.previousTax = value);
-        return Either.right(context);
     }
 
     private Either<BusinessException, Context> validateTaxBusiness(Context context) {
@@ -78,71 +70,77 @@ public class AddProductTaxService implements AddBusinessUseCase<CreateProductTax
                     return Either.right(ctx);
                 })
                 .flatMap(ctx -> {
-                    ProductTaxData previousTax = context.previousTax;
-                    if (Objects.nonNull(previousTax)) {
-                        if (!context.taxData.validFromAndUntil(previousTax))
-                            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_VALID_FROM_SMALLER_THAN_LAST_VALUE));
-                        LocalDate validFrom = ctx.request.validFrom();
-                        if (!previousTax.getValidFrom().isBefore(validFrom))
-                            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_VALID_FROM_MUST_BE_GREATHER_PREVIOUS));
+                    List<ProductTaxData> taxes = context.taxData
+                            .getProduct()
+                            .getTaxDataHistory()
+                            .stream()
+                            .sorted(Comparator.comparing(ProductTaxData::getId))
+                            .toList();
+                    int position = taxes.indexOf(ctx.taxData);
+                    context.previousTax = position > 0 ? Optional.of(taxes.get(position - 1)) : Optional.empty();
+                    context.nextTax = taxes.size() <= position + 1 ? Optional.of(taxes.get(position + 1)) : Optional.empty();
+                    context.previousTax.ifPresent(productTaxData -> productTaxData.setValidUntil(ctx.request.validFrom().minusDays(1)));
+                    if (context.nextTax.isPresent()) {
+                        context.nextTax.get().setValidFrom(ctx.request.validFrom().plusDays(1));
                     }
+
                     return Either.right(ctx);
                 });
     }
 
-    private Either<BusinessException, Context> createContext(CreateProductTaxRequest request) {
+    private Either<BusinessException, Context> createContext(UpdateProductTaxRequest request) {
         if (Objects.isNull(request))
             return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_REQUEST_NOT_NULL));
         return Either.right(Context.of(request));
     }
 
-    private Either<BusinessException, Context> findProduct(Context context) {
-        if (Objects.isNull(context.request.productId())) {
-            return Either.left(new BusinessException(ProductConstants.PRODUCT_NOT_FOUND));
+    private Either<BusinessException, Context> findProductTax(Context context) {
+        if (Objects.isNull(context.request.id())) {
+            return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_NOT_FOUND));
         }
-        Optional<Product> product = productRepository.findById(context.request.productId().toLong());
-        product.ifPresent(value -> context.product = value);
-        return product.isPresent() ?
+        Optional<ProductTaxData> productTaxData = productTaxDataRepository.findById(context.request.id().toLong());
+        productTaxData.ifPresent(value -> context.taxData = value);
+        return productTaxData.isPresent() ?
                 Either.right(context) :
                 Either.left(new BusinessException(ProductConstants.PRODUCT_NOT_FOUND));
     }
 
-    private Either<BusinessException, Context> createTaxData(Context context) {
-        context.taxData = ProductTaxData.builder()
-                .id(tsidGenerator.newIdAsLong())
-                .product(context.product)
-                .ncm(context.request.ncm())
-                .cstIpi(context.request.cstIpi())
-                .cstPis(context.request.cstPis())
-                .cstCofins(context.request.cstCofins())
-                .cfop(context.request.cfop())
-                .productType(context.request.productType())
-                .origin(context.request.origin())
-                .validFrom(context.request.validFrom())
-                .build();
+    private Either<BusinessException, Context> updateTaxData(Context context) {
+        ProductTaxData taxData = context.taxData;
+        taxData.setNcm(context.request.ncm());
+        taxData.setCstIpi(context.request.cstIpi());
+        taxData.setCstPis(context.request.cstPis());
+        taxData.setCstCofins(context.request.cstCofins());
+        taxData.setCfop(context.request.cfop());
+        taxData.setProductType(context.request.productType());
+        taxData.setOrigin(context.request.origin());
+        taxData.setValidFrom(context.request.validFrom());
+        taxData.setValidUntil(context.request.validUntil());
         return Either.right(context);
     }
 
     private Either<BusinessException, Context> saveTaxData(Context context) {
         if (Objects.nonNull(context.previousTax)) {
-            context.previousTax.setValidUntil(context.request.validFrom().minusDays(1));
-            context.previousTax = productTaxDataRepository.save(context.previousTax);
+            //context.previousTax.setValidUntil(context.request.validFrom().minusDays(1));
+            //context.previousTax = productTaxDataRepository.save(context.previousTax);
         }
         context.taxData = productTaxDataRepository.save(context.taxData);
         return Either.right(context);
     }
 
     private static class Context {
-        public final CreateProductTaxRequest request;
-        public Product product;
+        public final UpdateProductTaxRequest request;
         public ProductTaxData taxData;
-        public ProductTaxData previousTax;
+        public Optional<ProductTaxData> previousTax;
+        public Optional<ProductTaxData> nextTax;
 
-        private Context(CreateProductTaxRequest request) {
+        private Context(UpdateProductTaxRequest request) {
             this.request = request;
+            this.previousTax = Optional.empty();
+            this.nextTax = Optional.empty();
         }
 
-        public static Context of(CreateProductTaxRequest request) {
+        public static Context of(UpdateProductTaxRequest request) {
             return new Context(request);
         }
     }
