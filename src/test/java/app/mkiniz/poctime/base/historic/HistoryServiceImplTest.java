@@ -9,11 +9,14 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.BiFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class HistoryServiceImplTest {
+
+    private static final BiFunction<HistoryErrorEnum, HistoryEntity<?>, BusinessException> GENERATE_EXCEPTION =
+            (error, entity) -> Objects.nonNull(error) ? new BusinessException(error.name()) : null;
 
     private HistoryServiceImpl historyService;
     private BusinessException emptyException;
@@ -24,12 +27,31 @@ class HistoryServiceImplTest {
         emptyException = new BusinessException("");
     }
 
+
+    @Test
+    void when_Add_Entity_NullException() {
+        NullPointerException exception = assertThrows(NullPointerException.class,
+                () -> historyService.addHistory(null, GENERATE_EXCEPTION));
+        assertEquals("history.entity.is.null", exception.getMessage());
+    }
+
+    @Test
+    void when_Add_GenerateException_NullException() {
+        HistoryTest historyToTest = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 1, 1))
+                .build();
+        NullPointerException exception = assertThrows(NullPointerException.class,
+                () -> historyService.addHistory(historyToTest, null));
+        assertEquals("history.generate.business.exception.is.null", exception.getMessage());
+    }
+
+
     @Test
     void when_Add_WithoutHistory_NotNullResponse() {
         HistoryTest historyToTest = HistoryTest.builder()
                 .validFrom(LocalDate.of(2023, 1, 1))
                 .build();
-        Either<BusinessException, HistoryEntity<?>> response = historyService.addHistory(historyToTest, (error, entity) -> null);
+        Either<BusinessException, HistoryService.HistoryAdded> response = historyService.addHistory(historyToTest, GENERATE_EXCEPTION);
         assertNotNull(response);
         assertTrue(response.isRight());
     }
@@ -37,8 +59,7 @@ class HistoryServiceImplTest {
     @Test
     void when_Add_ValidFromNull_MustFail() {
         HistoryTest historyToTest = HistoryTest.builder().build();
-        Either<BusinessException, HistoryEntity<?>> response = historyService.addHistory(historyToTest,
-                (error, history) -> error == HistoryErrorEnum.VALID_FROM_NULL ? new BusinessException(error.name()) : null);
+        Either<BusinessException, HistoryService.HistoryAdded> response = historyService.addHistory(historyToTest, GENERATE_EXCEPTION);
         assertNotNull(response);
         assertTrue(response.isLeft());
         assertEquals(response.leftOrElse(emptyException).getMessage(), HistoryErrorEnum.VALID_FROM_NULL.name());
@@ -50,11 +71,48 @@ class HistoryServiceImplTest {
                 .validFrom(LocalDate.of(2023, 1, 1))
                 .validUntil(LocalDate.of(2023, 1, 2))
                 .build();
-        Either<BusinessException, HistoryEntity<?>> response = historyService.addHistory(historyToTest,
-                (error, history) -> error == HistoryErrorEnum.VALID_UNTIL_NOT_NULL ? new BusinessException(error.name()) : null);
+        Either<BusinessException, HistoryService.HistoryAdded> response = historyService.addHistory(historyToTest, GENERATE_EXCEPTION);
         assertNotNull(response);
         assertTrue(response.isLeft());
         assertEquals(response.leftOrElse(emptyException).getMessage(), HistoryErrorEnum.VALID_UNTIL_NOT_NULL.name());
+    }
+
+    @Test
+    void when_Add_ValidFrom_SmallerThanLastValidFrom() {
+        HistoryTest historyToTestList = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 1, 2))
+                .build();
+        HistoryTest historyToTest = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 1, 1))
+                .history(List.of(historyToTestList))
+                .build();
+        Either<BusinessException, HistoryService.HistoryAdded> response = historyService.addHistory(historyToTest, GENERATE_EXCEPTION);
+        assertNotNull(response);
+        assertTrue(response.isLeft());
+        assertEquals(response.leftOrElse(emptyException).getMessage(),
+                HistoryErrorEnum.VALID_FROM_SMALLER_THEN_LAST_VALID_FROM_HISTORY.name());
+    }
+
+    @Test
+    void when_Add_MustReturnHistoryAdded() {
+        HistoryTest historyToTestListFirst = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 1, 1))
+                .validFrom(LocalDate.of(2023, 1, 31))
+                .build();
+        HistoryTest historyToTestListLast = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 2, 1))
+                .build();
+        HistoryTest historyToTestNew = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 3, 1))
+                .history(List.of(historyToTestListFirst, historyToTestListLast))
+                .build();
+        Either<BusinessException, HistoryService.HistoryAdded> response = historyService.addHistory(historyToTestNew, GENERATE_EXCEPTION);
+        assertNotNull(response);
+        assertTrue(response.isRight());
+        HistoryService.HistoryAdded added = response.orElseGet(null);
+        assertEquals(added.adjustedEntity().validUntil(), historyToTestNew.validFrom().minusDays(1));
+        assertEquals(added.newEntity().validFrom(), historyToTestNew.validFrom());
+        assertNull(added.newEntity().validUntil());
     }
 
     @Builder
@@ -71,13 +129,13 @@ class HistoryServiceImplTest {
         }
 
         @Override
-        public Optional<LocalDate> validFrom() {
-            return Objects.isNull(this.validFrom) ? Optional.empty() : Optional.of(this.validFrom);
+        public LocalDate validFrom() {
+            return this.validFrom;
         }
 
         @Override
-        public Optional<LocalDate> validUntil() {
-            return Objects.isNull(this.validUntil) ? Optional.empty() : Optional.of(this.validUntil);
+        public LocalDate validUntil() {
+            return this.validUntil;
         }
 
         @Override
@@ -92,7 +150,7 @@ class HistoryServiceImplTest {
 
         @Override
         public List<HistoryEntity<Long>> getHistory() {
-            return this.history;
+            return Objects.isNull(this.history) ? List.of() : this.history;
         }
     }
 

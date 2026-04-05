@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.product.domain.tax;
 
+import app.mkiniz.poctime.base.historic.HistoryEntity;
 import app.mkiniz.poctime.product.ProductConstants;
 import app.mkiniz.poctime.product.domain.Product;
 import app.mkiniz.poctime.shared.business.BusinessException;
@@ -9,6 +10,7 @@ import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -18,7 +20,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductTaxData {
+public class ProductTaxData implements HistoryEntity<Long> {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
@@ -92,4 +94,34 @@ public class ProductTaxData {
         return true;
     }
 
+    @Override
+    public Long id() {
+        return this.id;
+    }
+
+    @Override
+    public LocalDate validFrom() {
+        return this.validFrom;
+    }
+
+    @Override
+    public LocalDate validUntil() {
+        return this.validUntil;
+    }
+
+    @Override
+    public void validFrom(LocalDate validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    @Override
+    public void validUntil(LocalDate validUntil) {
+        this.validUntil = validUntil;
+    }
+
+    @Override
+    public List<HistoryEntity<Long>> getHistory() {
+        List<ProductTaxData> list = this.getProduct().getTaxDataHistory();
+        return Objects.isNull(list) ? List.of() : List.copyOf(list);
+    }
 }

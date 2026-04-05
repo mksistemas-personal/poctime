@@ -1,5 +1,7 @@
 package app.mkiniz.poctime.product.services.tax;
 
+import app.mkiniz.poctime.base.historic.HistoryService;
+import app.mkiniz.poctime.base.historic.HistoryServiceImpl;
 import app.mkiniz.poctime.base.tax.cfop.CFOPRepository;
 import app.mkiniz.poctime.base.tax.cst.CSTRepository;
 import app.mkiniz.poctime.base.tax.ncm.NCMItem;
@@ -36,6 +38,7 @@ class AddProductTaxServiceTest {
     private NCMService ncmService;
     private CSTRepository csvRepository;
     private CFOPRepository cfopRepository;
+    private HistoryService historyService;
 
     private AddProductTaxService addProductTaxService;
 
@@ -52,14 +55,16 @@ class AddProductTaxServiceTest {
         csvRepository.loadCsv();
         cfopRepository = new CFOPRepository(new ObjectMapper(), new DefaultResourceLoader());
         cfopRepository.loadCfops();
+        historyService = new HistoryServiceImpl();
 
         addProductTaxService = new AddProductTaxService(
-                productTaxDataRepository,
-                productRepository,
-                tsidGenerator,
                 ncmService,
                 csvRepository,
-                cfopRepository
+                cfopRepository,
+                historyService,
+                productTaxDataRepository,
+                productRepository,
+                tsidGenerator
         );
 
         Tsid productId = Tsid.fast();
@@ -74,6 +79,7 @@ class AddProductTaxServiceTest {
                 .cstPis("01")
                 .cstCofins("01")
                 .cfop("5102")
+                .validFrom(java.time.LocalDate.now())
                 .build();
     }
 
@@ -81,7 +87,8 @@ class AddProductTaxServiceTest {
     void shouldAddProductTaxSuccessfully() {
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
         when(ncmService.findByCode("12345678")).thenReturn(Optional.of(new NCMItem("12345678", "Desc", "2024-01-01", "", "Ato", "1", "2024")));
-        when(productTaxDataRepository.save(any(ProductTaxData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(productTaxDataRepository.save(any(ProductTaxData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(productTaxDataRepository.save(null)).thenAnswer(invocation -> null);
 
         ProductTaxResponse response = addProductTaxService.execute(request);
 
@@ -104,9 +111,10 @@ class AddProductTaxServiceTest {
                 .build();
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
-        when(productTaxDataRepository.findFirstByProductAndValidUntilIsNull(product)).thenReturn(Optional.of(oldTaxData));
+        product.setTaxDataHistory(new java.util.ArrayList<>(java.util.List.of(oldTaxData)));
         when(ncmService.findByCode("12345678")).thenReturn(Optional.of(new NCMItem("12345678", "Desc", "2024-01-01", "", "Ato", "1", "2024")));
-        when(productTaxDataRepository.save(any(ProductTaxData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(productTaxDataRepository.save(any(ProductTaxData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(productTaxDataRepository.save(null)).thenAnswer(invocation -> null);
 
         java.time.LocalDate newValidFrom = java.time.LocalDate.now();
         request = CreateProductTaxRequest.builder()
@@ -122,9 +130,10 @@ class AddProductTaxServiceTest {
 
         addProductTaxService.execute(request);
 
-        assertEquals(newValidFrom, oldTaxData.getValidUntil());
+        assertNotNull(oldTaxData.getValidUntil());
+        assertEquals(newValidFrom.minusDays(1), oldTaxData.getValidUntil());
         verify(productTaxDataRepository).save(oldTaxData);
-        verify(productTaxDataRepository).save(argThat(tax -> tax.getValidFrom().equals(newValidFrom)));
+        verify(productTaxDataRepository).save(argThat(tax -> tax != null && tax.getValidFrom().equals(newValidFrom)));
     }
 
     @Test
@@ -139,6 +148,7 @@ class AddProductTaxServiceTest {
                 .cstPis("01")
                 .cstCofins("01")
                 .cfop("5102")
+                .validFrom(java.time.LocalDate.now())
                 .build();
 
         BusinessException exception = assertThrows(BusinessException.class, () -> addProductTaxService.execute(request));
