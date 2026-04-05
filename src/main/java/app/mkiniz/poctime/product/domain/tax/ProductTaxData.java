@@ -20,7 +20,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductTaxData implements HistoryEntity<Long> {
+public class ProductTaxData implements HistoryEntity {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
@@ -95,11 +95,6 @@ public class ProductTaxData implements HistoryEntity<Long> {
     }
 
     @Override
-    public Long id() {
-        return this.id;
-    }
-
-    @Override
     public LocalDate validFrom() {
         return this.validFrom;
     }
@@ -120,7 +115,7 @@ public class ProductTaxData implements HistoryEntity<Long> {
     }
 
     @Override
-    public List<HistoryEntity<Long>> getHistory() {
+    public List<HistoryEntity> getHistory() {
         List<ProductTaxData> list = this.getProduct().getTaxDataHistory();
         return Objects.isNull(list) ? List.of() : List.copyOf(list);
     }

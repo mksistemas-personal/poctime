@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HistoryServiceImplTest {
 
-    private static final BiFunction<HistoryErrorEnum, HistoryEntity<?>, BusinessException> GENERATE_EXCEPTION =
+    private static final BiFunction<HistoryErrorEnum, HistoryEntity, BusinessException> GENERATE_EXCEPTION =
             (error, entity) -> Objects.nonNull(error) ? new BusinessException(error.name()) : null;
 
     private HistoryServiceImpl historyService;
@@ -90,14 +90,14 @@ class HistoryServiceImplTest {
         assertNotNull(response);
         assertTrue(response.isLeft());
         assertEquals(response.leftOrElse(emptyException).getMessage(),
-                HistoryErrorEnum.VALID_FROM_SMALLER_THEN_LAST_VALID_FROM_HISTORY.name());
+                HistoryErrorEnum.VALID_FROM_MUST_BE_GREATER_THAN_LAST_ENTRY.name());
     }
 
     @Test
     void when_Add_MustReturnHistoryAdded() {
         HistoryTest historyToTestListFirst = HistoryTest.builder()
                 .validFrom(LocalDate.of(2023, 1, 1))
-                .validFrom(LocalDate.of(2023, 1, 31))
+                .validUntil(LocalDate.of(2023, 1, 31))
                 .build();
         HistoryTest historyToTestListLast = HistoryTest.builder()
                 .validFrom(LocalDate.of(2023, 2, 1))
@@ -115,18 +115,33 @@ class HistoryServiceImplTest {
         assertNull(added.newEntity().validUntil());
     }
 
+    @Test
+    void when_Add_MustReturnError() {
+        HistoryTest historyToTestListFirst = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 1, 1))
+                .validUntil(LocalDate.of(2023, 1, 31))
+                .build();
+        HistoryTest historyToTestListLast = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 2, 1))
+                .build();
+        HistoryTest historyToTestNew = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 2, 1))
+                .history(List.of(historyToTestListFirst, historyToTestListLast))
+                .build();
+        Either<BusinessException, HistoryService.HistoryAdded> response = historyService.addHistory(historyToTestNew, GENERATE_EXCEPTION);
+        assertNotNull(response);
+        assertTrue(response.isLeft());
+        assertEquals(response.leftOrElse(emptyException).getMessage(),
+                HistoryErrorEnum.VALID_FROM_MUST_BE_GREATER_THAN_LAST_ENTRY.name());
+
+    }
+
     @Builder
-    private static class HistoryTest implements HistoryEntity<Long> {
+    private static class HistoryTest implements HistoryEntity {
 
         private LocalDate validFrom;
         private LocalDate validUntil;
-        private List<HistoryEntity<Long>> history;
-        private Long id;
-
-        @Override
-        public Long id() {
-            return id;
-        }
+        private List<HistoryEntity> history;
 
         @Override
         public LocalDate validFrom() {
@@ -149,7 +164,7 @@ class HistoryServiceImplTest {
         }
 
         @Override
-        public List<HistoryEntity<Long>> getHistory() {
+        public List<HistoryEntity> getHistory() {
             return Objects.isNull(this.history) ? List.of() : this.history;
         }
     }

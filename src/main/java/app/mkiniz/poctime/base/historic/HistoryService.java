@@ -8,13 +8,14 @@ import java.util.function.BiFunction;
 
 public interface HistoryService {
     Either<BusinessException, HistoryAdded>
-    addHistory(HistoryEntity<?> entity,
-               BiFunction<HistoryErrorEnum, HistoryEntity<?>, BusinessException> generateBusinessException);
+    addHistory(HistoryEntity entity,
+               BiFunction<HistoryErrorEnum, HistoryEntity, BusinessException> generateBusinessException);
 
 
-    static record HistoryAdded(HistoryEntity<?> adjustedEntity, HistoryEntity<?> newEntity) {
+    static record HistoryAdded(HistoryEntity adjustedEntity, HistoryEntity newEntity) {
         public boolean hasAdjustedEntity() {
             return Objects.nonNull(adjustedEntity);
         }
     }
+
 }
