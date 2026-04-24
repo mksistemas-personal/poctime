@@ -10,10 +10,13 @@ import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Entity
 @Table(name = "product_tax_data")
@@ -24,6 +27,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE product SET deleted = true WHERE id = ?")
 @SQLRestriction("deleted = false")
+@Audited(targetAuditMode = NOT_AUDITED)
 public class ProductTaxData implements HistoryEntity {
 
     @Id
@@ -74,7 +78,7 @@ public class ProductTaxData implements HistoryEntity {
         return Objects.isNull(validUntil) && !date.isAfter(validUntil);
     }
 
-    public Either<BusinessException, ProductTaxData> valid() {
+    public Either<BusinessException, ProductTaxData> valid(boolean isInsert) {
         if (Objects.isNull(product))
             return Either.left(new BusinessException(ProductConstants.PRODUCT_NOT_NULL));
         if (StringUtils.isBlank(ncm))
@@ -89,7 +93,7 @@ public class ProductTaxData implements HistoryEntity {
             return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_CFOP_NOT_BLANK));
         if (Objects.isNull(validFrom))
             return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_VALID_FROM_NOT_NULL));
-        if (Objects.nonNull(validUntil))
+        if (isInsert && Objects.nonNull(validUntil))
             return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_VALID_UNTIL_MOST_BE_NULL));
         return Either.right(this);
     }

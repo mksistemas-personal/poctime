@@ -59,7 +59,7 @@ public class AddProductTaxService
     }
 
     private Either<BusinessException, Context> validateTaxBusiness(Context context) {
-        return context.taxData.valid()
+        return context.taxData.valid(true)
                 .map(taxData -> context)
                 .flatMap(this::validateNcm)
                 .flatMap(this::validateCst)

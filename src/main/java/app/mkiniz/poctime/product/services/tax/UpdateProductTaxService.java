@@ -40,7 +40,7 @@ public class UpdateProductTaxService
 
     @Override
     public ProductTaxResponse execute(Tsid id, UpdateProductTaxRequest request) {
-        return (ProductTaxResponse) createContext(request)
+        return (ProductTaxResponse) createContext(id, request)
                 .flatMap(this::findProductTax)
                 .flatMap(this::updateTaxData)
                 .flatMap(this::validateTaxBusiness)
@@ -50,7 +50,7 @@ public class UpdateProductTaxService
     }
 
     private Either<BusinessException, Context> validateTaxBusiness(Context context) {
-        return context.taxData.valid()
+        return context.taxData.valid(false)
                 .map(taxData -> context)
                 .flatMap(this::validateNcm)
                 .flatMap(this::validateCst)
@@ -58,17 +58,17 @@ public class UpdateProductTaxService
                 .map(requestCtx -> context);
     }
 
-    private Either<BusinessException, Context> createContext(UpdateProductTaxRequest request) {
+    private Either<BusinessException, Context> createContext(Tsid id, UpdateProductTaxRequest request) {
         if (Objects.isNull(request))
             return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_REQUEST_NOT_NULL));
-        return Either.right(Context.of(request));
+        return Either.right(Context.of(id, request));
     }
 
     private Either<BusinessException, Context> findProductTax(Context context) {
-        if (Objects.isNull(context.request.id())) {
+        if (Objects.isNull(context.id)) {
             return Either.left(new BusinessException(ProductConstants.PRODUCT_TAX_NOT_FOUND));
         }
-        Optional<ProductTaxData> productTaxData = productTaxDataRepository.findById(context.request.id().toLong());
+        Optional<ProductTaxData> productTaxData = productTaxDataRepository.findById(context.id.toLong());
         productTaxData.ifPresent(value -> context.taxData = value);
         return productTaxData.isPresent() ?
                 Either.right(context) :
@@ -96,13 +96,15 @@ public class UpdateProductTaxService
     private static class Context implements ContextRequest {
         public final UpdateProductTaxRequest request;
         public ProductTaxData taxData;
+        public Tsid id;
 
-        protected Context(UpdateProductTaxRequest request) {
+        protected Context(Tsid id, UpdateProductTaxRequest request) {
+            this.id = id;
             this.request = request;
         }
 
-        public static Context of(UpdateProductTaxRequest request) {
-            return new Context(request);
+        public static Context of(Tsid id, UpdateProductTaxRequest request) {
+            return new Context(id, request);
         }
 
         @Override
