@@ -1,5 +1,6 @@
 package app.mkiniz.poctime.product.services.tax;
 
+import app.mkiniz.poctime.base.historic.HistoryErrorEnum;
 import app.mkiniz.poctime.base.historic.HistoryService;
 import app.mkiniz.poctime.base.tax.cfop.CFOPRepository;
 import app.mkiniz.poctime.base.tax.cst.CSTRepository;
@@ -63,6 +64,7 @@ public class AddProductTaxService
                 .flatMap(this::validateNcm)
                 .flatMap(this::validateCst)
                 .flatMap(this::validateCfop)
+                .map(requestCtx -> context)
                 .flatMap(this::addHistory);
     }
 
@@ -104,6 +106,64 @@ public class AddProductTaxService
             productTaxDataRepository.save((ProductTaxData) context.historyAdded.adjustedEntity());
         productTaxDataRepository.save(context.taxData);
         return Either.right(context);
+    }
+
+    protected Either<BusinessException, Context> addHistory(Context ctx) {
+        return historyService.addHistory(ctx.taxData, (error, history) -> {
+                    return switch (error) {
+                        case HistoryErrorEnum.VALID_FROM_NULL ->
+                                new BusinessException(ProductConstants.PRODUCT_TAX_VALID_FROM_NOT_NULL);
+                        case HistoryErrorEnum.VALID_UNTIL_NOT_NULL ->
+                                new BusinessException(ProductConstants.PRODUCT_TAX_VALID_UNTIL_MOST_BE_NULL);
+                        case HistoryErrorEnum.VALID_FROM_SMALLER_THEN_LAST_VALID_FROM_HISTORY ->
+                                new BusinessException(ProductConstants.PRODUCT_TAX_VALID_FROM_SMALLER_THAN_LAST_VALUE);
+                        default -> new BusinessException(error.name());
+                    };
+                })
+                .map(response -> {
+                    ctx.historyAdded = response;
+                    return ctx;
+                });
+    }
+
+    private static class Context implements ContextRequest {
+        public final CreateProductTaxRequest request;
+        public Product product;
+        public ProductTaxData taxData;
+        public HistoryService.HistoryAdded historyAdded;
+
+        protected Context(CreateProductTaxRequest request) {
+            this.request = request;
+        }
+
+        public static Context of(CreateProductTaxRequest request) {
+            return new Context(request);
+        }
+
+        @Override
+        public String ncm() {
+            return this.request.ncm();
+        }
+
+        @Override
+        public String cstIpi() {
+            return this.request.cstIpi();
+        }
+
+        @Override
+        public String cstPis() {
+            return this.request.cstPis();
+        }
+
+        @Override
+        public String cstCofins() {
+            return this.request.cstCofins();
+        }
+
+        @Override
+        public String cfop() {
+            return this.request.cfop();
+        }
     }
 
 }

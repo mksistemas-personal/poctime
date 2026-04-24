@@ -8,6 +8,8 @@ import cyclops.control.Either;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +22,8 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE product SET deleted = true WHERE id = ?")
+@SQLRestriction("deleted = false")
 public class ProductTaxData implements HistoryEntity {
 
     @Id
@@ -58,6 +62,9 @@ public class ProductTaxData implements HistoryEntity {
 
     @Column(name = "valid_until")
     private LocalDate validUntil;
+
+    @Column(name = "deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean deleted = false;
 
     public boolean isBefore(LocalDate date) {
         return Objects.nonNull(validUntil) && date.isBefore(validUntil);

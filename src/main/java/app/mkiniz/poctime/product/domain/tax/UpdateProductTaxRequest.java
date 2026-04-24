@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
-import java.time.LocalDate;
-
 @Builder
 public record UpdateProductTaxRequest(
         @NotNull(message = ProductConstants.PRODUCT_TAX_ID_NOT_NULL)
@@ -23,9 +21,7 @@ public record UpdateProductTaxRequest(
         @NotBlank(message = ProductConstants.PRODUCT_TAX_CFOP_NOT_BLANK)
         String cfop,
         ProductType productType,
-        GoodsOrigin origin,
-        LocalDate validFrom,
-        LocalDate validUntil
+        GoodsOrigin origin
 ) {
     public static UpdateProductTaxRequest from(ProductTaxData taxData) {
         if (taxData == null) {
@@ -40,8 +36,6 @@ public record UpdateProductTaxRequest(
                 .cfop(taxData.getCfop())
                 .productType(taxData.getProductType())
                 .origin(taxData.getOrigin())
-                .validFrom(taxData.getValidFrom())
-                .validUntil(taxData.getValidUntil())
                 .build();
     }
 }

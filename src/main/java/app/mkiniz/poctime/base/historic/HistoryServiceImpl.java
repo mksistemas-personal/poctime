@@ -4,6 +4,7 @@ import app.mkiniz.poctime.shared.business.BusinessException;
 import cyclops.control.Either;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
@@ -29,5 +30,15 @@ public class HistoryServiceImpl implements HistoryService {
             return Either.right(new HistoryAdded(lastEntity, entity));
         }
         return Either.right(new HistoryAdded(null, entity));
+    }
+
+    @Override
+    public Either<BusinessException, HistoryEntity> updateHistory(HistoryEntity entity, LocalDate validFrom, LocalDate validUntil,
+                                                                  BiFunction<HistoryErrorEnum, HistoryEntity, BusinessException> generateBusinessException) {
+        if (!entity.validFrom().isEqual(validFrom))
+            return Either.left(generateBusinessException.apply(HistoryErrorEnum.VALID_FROM_MUST_BE_EQUAL_TO_VALID_FROM, entity));
+        if (!Objects.equals(validUntil, entity.validUntil()))
+            return Either.left(generateBusinessException.apply(HistoryErrorEnum.VALID_UNTIL_MUST_BE_EQUAL_TO_VALID_UNTIL, entity));
+        return Either.right(entity);
     }
 }

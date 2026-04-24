@@ -25,9 +25,12 @@ public class ProductConstants {
     public static final String PRODUCT_TAX_VALID_FROM_MUST_BE_GREATHER_PREVIOUS = "product.tax.valid.from.must.be.greather.previous";
     public static final String PRODUCT_TAX_ID_NOT_NULL = "product.tax.id.not.null";
     public static final String PRODUCT_TAX_NOT_FOUND = "product.tax.not.found";
+    public static final String VALID_FROM_MUST_BE_EQUAL_TO_VALID_FROM = "product.tax.valid.from.must.be.equal.to.valid.from";
+    public static final String VALID_UNTIL_MUST_BE_EQUAL_TO_VALID_UNTIL = "product.tax.valid.until.must.be.equal.to.valid.until";
 
     // RABBITMQ CONSTANTS
     public static final String PRODUCT_INPUT_EXCHANGE = "exchange.in.product";
     public static final String PRODUCT_OUTPUT_EXCHANGE = "exchange.out.product";
+
 
 }
