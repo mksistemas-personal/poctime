@@ -92,7 +92,6 @@ public class UpdateProductTaxService
         return Either.right(context);
     }
 
-
     private static class Context implements ContextRequest {
         public final UpdateProductTaxRequest request;
         public ProductTaxData taxData;

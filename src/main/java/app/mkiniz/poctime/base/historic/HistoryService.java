@@ -16,6 +16,8 @@ public interface HistoryService {
     updateHistory(HistoryEntity entity, LocalDate validFrom, LocalDate validUntil,
                   BiFunction<HistoryErrorEnum, HistoryEntity, BusinessException> generateBusinessException);
 
+    HistoryEntity adjustFromDeletedHistory(HistoryEntity entityBeDeleted);
+
     static record HistoryAdded(HistoryEntity adjustedEntity, HistoryEntity newEntity) {
         public boolean hasAdjustedEntity() {
             return Objects.nonNull(adjustedEntity);

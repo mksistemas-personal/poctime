@@ -136,6 +136,92 @@ class HistoryServiceImplTest {
 
     }
 
+    @Test
+    void when_Update_ValidFromDiffers_MustFail() {
+        HistoryTest entity = HistoryTest.builder().validFrom(LocalDate.of(2023, 1, 1)).build();
+        Either<BusinessException, HistoryEntity> response = historyService.updateHistory(entity, LocalDate.of(2023, 1, 2), null, GENERATE_EXCEPTION);
+        assertTrue(response.isLeft());
+        assertEquals(HistoryErrorEnum.VALID_FROM_MUST_BE_EQUAL_TO_VALID_FROM.name(), response.leftOrElse(emptyException).getMessage());
+    }
+
+    @Test
+    void when_Update_ValidUntilDiffers_MustFail() {
+        HistoryTest entity = HistoryTest.builder()
+                .validFrom(LocalDate.of(2023, 1, 1))
+                .validUntil(LocalDate.of(2023, 1, 31))
+                .build();
+        Either<BusinessException, HistoryEntity> response = historyService.updateHistory(entity, LocalDate.of(2023, 1, 1), LocalDate.of(2023, 2, 1), GENERATE_EXCEPTION);
+        assertTrue(response.isLeft());
+        assertEquals(HistoryErrorEnum.VALID_UNTIL_MUST_BE_EQUAL_TO_VALID_UNTIL.name(), response.leftOrElse(emptyException).getMessage());
+    }
+
+    @Test
+    void when_Update_Valid_MustReturnEntity() {
+        LocalDate from = LocalDate.of(2023, 1, 1);
+        LocalDate until = LocalDate.of(2023, 1, 31);
+        HistoryTest entity = HistoryTest.builder().validFrom(from).validUntil(until).build();
+        Either<BusinessException, HistoryEntity> response = historyService.updateHistory(entity, from, until, GENERATE_EXCEPTION);
+        assertTrue(response.isRight());
+        assertEquals(entity, response.orElse(null));
+    }
+
+    @Test
+    void when_Adjust_FirstDeleted_MustAdjustNext() {
+        LocalDate d1 = LocalDate.of(2023, 1, 1);
+        LocalDate d2 = LocalDate.of(2023, 2, 1);
+        LocalDate d3 = LocalDate.of(2023, 3, 1);
+
+        HistoryTest e1 = HistoryTest.builder().validFrom(d1).validUntil(d2.minusDays(1)).build();
+        HistoryTest e2 = HistoryTest.builder().validFrom(d2).validUntil(d3.minusDays(1)).build();
+        HistoryTest e3 = HistoryTest.builder().validFrom(d3).validUntil(null).build();
+
+        List<HistoryEntity> history = List.of(e1, e2, e3);
+        e1.history = history;
+        e2.history = history;
+        e3.history = history;
+
+        HistoryEntity result = historyService.adjustFromDeletedHistory(e1);
+        assertEquals(e2, result);
+        assertEquals(d1, e2.validFrom());
+    }
+
+    @Test
+    void when_Adjust_LastDeleted_MustAdjustPrevious() {
+        LocalDate d1 = LocalDate.of(2023, 1, 1);
+        LocalDate d2 = LocalDate.of(2023, 2, 1);
+
+        HistoryTest e1 = HistoryTest.builder().validFrom(d1).validUntil(d2.minusDays(1)).build();
+        HistoryTest e2 = HistoryTest.builder().validFrom(d2).validUntil(null).build();
+
+        List<HistoryEntity> history = List.of(e1, e2);
+        e1.history = history;
+        e2.history = history;
+
+        HistoryEntity result = historyService.adjustFromDeletedHistory(e2);
+        assertEquals(e1, result);
+        assertNull(e1.validUntil());
+    }
+
+    @Test
+    void when_Adjust_MiddleDeleted_MustAdjustPrevious() {
+        LocalDate d1 = LocalDate.of(2023, 1, 1);
+        LocalDate d2 = LocalDate.of(2023, 2, 1);
+        LocalDate d3 = LocalDate.of(2023, 3, 1);
+
+        HistoryTest e1 = HistoryTest.builder().validFrom(d1).validUntil(d2.minusDays(1)).build();
+        HistoryTest e2 = HistoryTest.builder().validFrom(d2).validUntil(d3.minusDays(1)).build();
+        HistoryTest e3 = HistoryTest.builder().validFrom(d3).validUntil(null).build();
+
+        List<HistoryEntity> history = List.of(e1, e2, e3);
+        e1.history = history;
+        e2.history = history;
+        e3.history = history;
+
+        HistoryEntity result = historyService.adjustFromDeletedHistory(e2);
+        assertEquals(e1, result);
+        assertEquals(d2, e1.validUntil());
+    }
+
     @Builder
     private static class HistoryTest implements HistoryEntity {
 
