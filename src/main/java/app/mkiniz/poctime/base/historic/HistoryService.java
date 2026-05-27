@@ -5,6 +5,7 @@ import cyclops.control.Either;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 public interface HistoryService {
@@ -16,7 +17,7 @@ public interface HistoryService {
     updateHistory(HistoryEntity entity, LocalDate validFrom, LocalDate validUntil,
                   BiFunction<HistoryErrorEnum, HistoryEntity, BusinessException> generateBusinessException);
 
-    HistoryEntity adjustFromDeletedHistory(HistoryEntity entityBeDeleted);
+    Optional<HistoryEntity> adjustFromDeletedHistory(HistoryEntity entityBeDeleted);
 
     static record HistoryAdded(HistoryEntity adjustedEntity, HistoryEntity newEntity) {
         public boolean hasAdjustedEntity() {

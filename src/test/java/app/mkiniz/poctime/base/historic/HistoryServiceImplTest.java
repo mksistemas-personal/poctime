@@ -180,7 +180,7 @@ class HistoryServiceImplTest {
         e2.history = history;
         e3.history = history;
 
-        HistoryEntity result = historyService.adjustFromDeletedHistory(e1);
+        HistoryEntity result = historyService.adjustFromDeletedHistory(e1).get();
         assertEquals(e2, result);
         assertEquals(d1, e2.validFrom());
     }
@@ -197,7 +197,7 @@ class HistoryServiceImplTest {
         e1.history = history;
         e2.history = history;
 
-        HistoryEntity result = historyService.adjustFromDeletedHistory(e2);
+        HistoryEntity result = historyService.adjustFromDeletedHistory(e2).get();
         assertEquals(e1, result);
         assertNull(e1.validUntil());
     }
@@ -217,7 +217,7 @@ class HistoryServiceImplTest {
         e2.history = history;
         e3.history = history;
 
-        HistoryEntity result = historyService.adjustFromDeletedHistory(e2);
+        HistoryEntity result = historyService.adjustFromDeletedHistory(e2).get();
         assertEquals(e1, result);
         assertEquals(d2, e1.validUntil());
     }

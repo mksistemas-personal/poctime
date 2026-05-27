@@ -45,7 +45,7 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public HistoryEntity adjustFromDeletedHistory(HistoryEntity entityToBeDeleted) {
+    public Optional<HistoryEntity> adjustFromDeletedHistory(HistoryEntity entityToBeDeleted) {
         List<HistoryEntity> histories = entityToBeDeleted.getHistory().stream()
                 .sorted((left, right) -> left.validFrom().compareTo(right.validFrom())).toList();
         HistoryEntity first = histories.getFirst();
@@ -54,15 +54,15 @@ public class HistoryServiceImpl implements HistoryService {
         if (isSame(first, entityToBeDeleted)) {
             Optional<HistoryEntity> nextFromFirst = histories.stream().skip(1).findFirst();
             nextFromFirst.ifPresent(historyEntity -> historyEntity.validFrom(entityToBeDeleted.validFrom()));
-            return nextFromFirst.orElse(null);
+            return nextFromFirst;
         } else if (isSame(last, entityToBeDeleted)) {
             Optional<HistoryEntity> previousFromLast = histories.stream().skip(histories.size() - 2).findFirst();
             previousFromLast.ifPresent(historyEntity -> historyEntity.validUntil(null));
-            return previousFromLast.orElse(null);
+            return previousFromLast;
         } else {
             Optional<HistoryEntity> previous = histories.stream().skip(histories.indexOf(entityToBeDeleted) - 1).findFirst();
             previous.ifPresent(historyEntity -> historyEntity.validUntil(entityToBeDeleted.validFrom()));
-            return previous.orElse(null);
+            return previous;
         }
     }
 
