@@ -1,20 +1,15 @@
 package app.mkiniz.poctime.person.adapters;
 
-import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.person.domain.PersonRequest;
 import app.mkiniz.poctime.person.domain.PersonResponse;
+import app.mkiniz.poctime.person.domain.PersonSearchRequest;
 import app.mkiniz.poctime.shared.business.*;
-import app.mkiniz.poctime.shared.specification.JsonPathLike;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +24,7 @@ public class PersonController {
     private final UpdateBusinessUseCase<Tsid, PersonRequest, PersonResponse> updatePersonService;
     private final DeleteBusinessUseCase<Tsid, PersonResponse> deletePersonService;
     private final GetByIdBusinessUseCase<Tsid, PersonResponse> getPersonByIdService;
-    private final GetAllBusinessUseCase<Specification<Person>, Maybe<Slice<PersonResponse>>> getAllPersonService;
+    private final GetAllBusinessUseCase<PersonSearchRequest, Maybe<Slice<PersonResponse>>> getAllPersonService;
 
     @PostMapping
     public PersonResponse createPerson(@Valid @RequestBody PersonRequest request) {
@@ -53,11 +48,8 @@ public class PersonController {
 
     @GetMapping
     public ResponseEntity<Slice<PersonResponse>> getAllPeople(
-            @And({
-                    @Spec(path = "name", params = "name", spec = LikeIgnoreCase.class),
-                    @Spec(path = "document.identifier", params = "identifier", spec = JsonPathLike.class)
-            }) Specification<Person> spec, Pageable pageable) {
-        return getAllPersonService.execute(pageable, spec)
+            PersonSearchRequest request, Pageable pageable) {
+        return getAllPersonService.execute(pageable, request)
                 .fold(
                         ResponseEntity::ok,
                         () -> ResponseEntity.noContent().build()

@@ -8,45 +8,36 @@ import app.mkiniz.poctime.shared.business.EntityCreated;
 import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
 import cyclops.control.Either;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.type.SqlTypes;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.Objects;
 
-@Entity
 @Table(name = "person")
 @Getter
 @Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE person SET deleted = true WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class Person extends AbstractAggregateRoot<Person> implements EntityCreated, EntityUpdated, EntityDeleted {
 
     @Id
-    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
+    @Column("id")
     private Long id;
 
     private String name;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "document", columnDefinition = "jsonb", nullable = false)
+    @Column("document")
     private Document<?, ?> document;
 
     public Document<?, ?> getDocument() {
         return document;
     }
 
-    @Column(name = "deleted", nullable = false)
+    @Column("deleted")
     private boolean deleted = false;
 
     public PersonKindEnumeration whatKind() {
