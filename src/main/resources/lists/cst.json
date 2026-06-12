@@ -1,0 +1,402 @@
+[
+  {
+    "type": "ipi",
+    "code": "00",
+    "description": "Entrada com Recuperação de Crédito"
+  },
+  {
+    "type": "ipi",
+    "code": "01",
+    "description": "Entrada Tributável com Alíquota Zero"
+  },
+  {
+    "type": "ipi",
+    "code": "02",
+    "description": "Entrada Isenta"
+  },
+  {
+    "type": "ipi",
+    "code": "03",
+    "description": "Entrada Não-Tributada"
+  },
+  {
+    "type": "ipi",
+    "code": "04",
+    "description": "Entrada Imune"
+  },
+  {
+    "type": "ipi",
+    "code": "05",
+    "description": "Entrada com Suspensão"
+  },
+  {
+    "type": "ipi",
+    "code": "49",
+    "description": "Outras Entradas"
+  },
+  {
+    "type": "ipi",
+    "code": "50",
+    "description": "Saída Tributada"
+  },
+  {
+    "type": "ipi",
+    "code": "51",
+    "description": "Saída Tributável com Alíquota Zero"
+  },
+  {
+    "type": "ipi",
+    "code": "52",
+    "description": "Saída Isenta"
+  },
+  {
+    "type": "ipi",
+    "code": "53",
+    "description": "Saída Não-Tributada"
+  },
+  {
+    "type": "ipi",
+    "code": "54",
+    "description": "Saída Imune"
+  },
+  {
+    "type": "ipi",
+    "code": "55",
+    "description": "Saída com Suspensão"
+  },
+  {
+    "type": "ipi",
+    "code": "99",
+    "description": "Outras Saídas"
+  },
+  {
+    "type": "pis",
+    "code": "01",
+    "description": "Operação Tributável com Alíquota Básica"
+  },
+  {
+    "type": "pis",
+    "code": "02",
+    "description": "Operação Tributável com Alíquota Diferenciada"
+  },
+  {
+    "type": "pis",
+    "code": "03",
+    "description": "Operação Tributável com Alíquota por Unidade de Medida de Produto"
+  },
+  {
+    "type": "pis",
+    "code": "04",
+    "description": "Operação Tributável Monofásica - Revenda a Alíquota Zero"
+  },
+  {
+    "type": "pis",
+    "code": "05",
+    "description": "Operação Tributável por Substituição Tributária"
+  },
+  {
+    "type": "pis",
+    "code": "06",
+    "description": "Operação Tributável a Alíquota Zero"
+  },
+  {
+    "type": "pis",
+    "code": "07",
+    "description": "Operação Isenta da Contribuição"
+  },
+  {
+    "type": "pis",
+    "code": "08",
+    "description": "Operação sem Incidência da Contribuição"
+  },
+  {
+    "type": "pis",
+    "code": "09",
+    "description": "Operação com Suspensão da Contribuição"
+  },
+  {
+    "type": "pis",
+    "code": "49",
+    "description": "Outras Operações de Saída"
+  },
+  {
+    "type": "pis",
+    "code": "50",
+    "description": "Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Tributada no Mercado Interno"
+  },
+  {
+    "type": "pis",
+    "code": "51",
+    "description": "Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Não Tributada no Mercado Interno"
+  },
+  {
+    "type": "pis",
+    "code": "52",
+    "description": "Operação com Direito a Crédito - Vinculada Exclusivamente a Receita de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "53",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno"
+  },
+  {
+    "type": "pis",
+    "code": "54",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "55",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Não-Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "56",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno, e de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "60",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Tributada no Mercado Interno"
+  },
+  {
+    "type": "pis",
+    "code": "61",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Não-Tributada no Mercado Interno"
+  },
+  {
+    "type": "pis",
+    "code": "62",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "63",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno"
+  },
+  {
+    "type": "pis",
+    "code": "64",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "65",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Não-Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "66",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno, e de Exportação"
+  },
+  {
+    "type": "pis",
+    "code": "67",
+    "description": "Crédito Presumido - Outras Operações"
+  },
+  {
+    "type": "pis",
+    "code": "70",
+    "description": "Operação de Aquisição sem Direito a Crédito"
+  },
+  {
+    "type": "pis",
+    "code": "71",
+    "description": "Operação de Aquisição com Isenção"
+  },
+  {
+    "type": "pis",
+    "code": "72",
+    "description": "Operação de Aquisição com Suspensão"
+  },
+  {
+    "type": "pis",
+    "code": "73",
+    "description": "Operação de Aquisição a Alíquota Zero"
+  },
+  {
+    "type": "pis",
+    "code": "74",
+    "description": "Operação de Aquisição sem Incidência da Contribuição"
+  },
+  {
+    "type": "pis",
+    "code": "75",
+    "description": "Operação de Aquisição por Substituição Tributária"
+  },
+  {
+    "type": "pis",
+    "code": "98",
+    "description": "Outras Operações de Entrada"
+  },
+  {
+    "type": "pis",
+    "code": "99",
+    "description": "Outras Operações"
+  },
+  {
+    "type": "cofins",
+    "code": "01",
+    "description": "Operação Tributável com Alíquota Básica"
+  },
+  {
+    "type": "cofins",
+    "code": "02",
+    "description": "Operação Tributável com Alíquota Diferenciada"
+  },
+  {
+    "type": "cofins",
+    "code": "03",
+    "description": "Operação Tributável com Alíquota por Unidade de Medida de Produto"
+  },
+  {
+    "type": "cofins",
+    "code": "04",
+    "description": "Operação Tributável Monofásica - Revenda a Alíquota Zero"
+  },
+  {
+    "type": "cofins",
+    "code": "05",
+    "description": "Operação Tributável por Substituição Tributária"
+  },
+  {
+    "type": "cofins",
+    "code": "06",
+    "description": "Operação Tributável a Alíquota Zero"
+  },
+  {
+    "type": "cofins",
+    "code": "07",
+    "description": "Operação Isenta da Contribuição"
+  },
+  {
+    "type": "cofins",
+    "code": "08",
+    "description": "Operação sem Incidência da Contribuição"
+  },
+  {
+    "type": "cofins",
+    "code": "09",
+    "description": "Operação com Suspensão da Contribuição"
+  },
+  {
+    "type": "cofins",
+    "code": "49",
+    "description": "Outras Operações de Saída"
+  },
+  {
+    "type": "cofins",
+    "code": "50",
+    "description": "Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Tributada no Mercado Interno"
+  },
+  {
+    "type": "cofins",
+    "code": "51",
+    "description": "Operação com Direito a Crédito - Vinculada Exclusivamente a Receita Não-Tributada no Mercado Interno"
+  },
+  {
+    "type": "cofins",
+    "code": "52",
+    "description": "Operação com Direito a Crédito - Vinculada Exclusivamente a Receita de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "53",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno"
+  },
+  {
+    "type": "cofins",
+    "code": "54",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "55",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Não Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "56",
+    "description": "Operação com Direito a Crédito - Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "60",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Tributada no Mercado Interno"
+  },
+  {
+    "type": "cofins",
+    "code": "61",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita Não-Tributada no Mercado Interno"
+  },
+  {
+    "type": "cofins",
+    "code": "62",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada Exclusivamente a Receita de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "63",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno"
+  },
+  {
+    "type": "cofins",
+    "code": "64",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "65",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Não-Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "66",
+    "description": "Crédito Presumido - Operação de Aquisição Vinculada a Receitas Tributadas e Não-Tributadas no Mercado Interno e de Exportação"
+  },
+  {
+    "type": "cofins",
+    "code": "67",
+    "description": "Crédito Presumido - Outras Operações"
+  },
+  {
+    "type": "cofins",
+    "code": "70",
+    "description": "Operação de Aquisição sem Direito a Crédito"
+  },
+  {
+    "type": "cofins",
+    "code": "71",
+    "description": "Operação de Aquisição com Isenção"
+  },
+  {
+    "type": "cofins",
+    "code": "72",
+    "description": "Operação de Aquisição com Suspensão"
+  },
+  {
+    "type": "cofins",
+    "code": "73",
+    "description": "Operação de Aquisição a Alíquota Zero"
+  },
+  {
+    "type": "cofins",
+    "code": "74",
+    "description": "Operação de Aquisição sem Incidência da Contribuição"
+  },
+  {
+    "type": "cofins",
+    "code": "75",
+    "description": "Operação de Aquisição por Substituição Tributária"
+  },
+  {
+    "type": "cofins",
+    "code": "98",
+    "description": "Outras Operações de Entrada"
+  },
+  {
+    "type": "cofins",
+    "code": "99",
+    "description": "Outras Operações"
+  }
+]

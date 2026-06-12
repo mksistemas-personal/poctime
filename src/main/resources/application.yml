@@ -9,6 +9,11 @@ spring:
           issuer-uri: http://localhost:9090/realms/poctime-app
           jwk-set-uri: http://localhost:9090/realms/poctime-app/protocol/openid-connect/certs
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   datasource:
     url: jdbc:postgresql://localhost:5432/poctime
     username: admin
@@ -21,6 +26,7 @@ spring:
     properties:
       hibernate:
         dialect: app.mkiniz.poctime.shared.repository.PostgreSQLDialectCustom
+        format_sql: true
 
   rabbitmq:
     host: localhost
@@ -34,4 +40,22 @@ server:
 
 logging:
   level:
+    root: INFO
+    app.mkiniz.poctime.base.tax.ncm: DEBUG
     org.springframework.amqp.rabbit.core.RabbitAdmin: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.results.bind: TRACE
+
+
+rabbitmq:
+  dlx-exchange: dlx.poctime
+  dlx-queue: dlx.poctime.queue
+  dlx-routing-key: poctime.error
+
+poctime:
+  ncm:
+    url: https://portalunico.siscomex.gov.br/classif/api/publico/nomenclatura/download/json?perfil=PUBLICO
+    tenant: 0px7wdx2f3dh0
+    timeoutInSeconds: 18000
+
+kind: Application

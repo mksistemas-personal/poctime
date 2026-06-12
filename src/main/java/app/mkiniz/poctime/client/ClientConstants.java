@@ -12,5 +12,6 @@ public class ClientConstants {
     public static final String CLIENT_NOT_FOUND = "client.not.found";
 
     // RABBITMQ CONSTANTS
-    public static final String CLIENT_EXCHANGE = "exchange.client";
+    public static final String CLIENT_INPUT_EXCHANGE = "exchange.in.client";
+    public static final String CLIENT_OUTPUT_EXCHANGE = "exchange.out.client";
 }

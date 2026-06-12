@@ -19,7 +19,8 @@ public class OrganizationConstants {
 
 
     // RABBITMQ CONSTANTS
-    public static final String ORGANIZATION_EXCHANGE = "exchange.organization";
+    public static final String ORGANIZATION_INPUT_EXCHANGE = "exchange.in.organization";
+    public static final String ORGANIZATION_OUTPUT_EXCHANGE = "exchange.out.organization";
 
 
 }

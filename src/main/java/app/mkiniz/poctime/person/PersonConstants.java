@@ -11,7 +11,6 @@ public class PersonConstants {
     public static final String CANNOT_REMOVE_PERSON_CLIENT = "person.cannot.remove.because.client";
 
     // RABBITMQ CONSTANTS
-    public static final String PERSON_EXCHANGE = "exchange.person";
-
-
+    public static final String PERSON_INPUT_EXCHANGE = "exchange.in.person";
+    public static final String PERSON_OUTPUT_EXCHANGE = "exchange.out.person";
 }
