@@ -5,22 +5,19 @@ import app.mkiniz.poctime.base.document.bra.CnpjDocument;
 import app.mkiniz.poctime.client.domain.Client;
 import app.mkiniz.poctime.client.domain.ClientRepository;
 import app.mkiniz.poctime.client.domain.ClientResponse;
+import app.mkiniz.poctime.client.domain.ClientSearchRequest;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.GetAllBaseBusinessTest;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
-import net.kaczmarzyk.spring.data.jpa.domain.Like;
-import net.kaczmarzyk.spring.data.jpa.web.DefaultQueryContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -38,7 +35,7 @@ class GetAllClientServiceTest {
     @InjectMocks
     private TsidGenerator generator;
 
-    private GetAllBaseBusinessTest<Specification<Client>, Slice<ClientResponse>> baseTest;
+    private GetAllBaseBusinessTest<ClientSearchRequest, Slice<ClientResponse>> baseTest;
 
     private Client client1;
     private Client client2;
@@ -88,17 +85,14 @@ class GetAllClientServiceTest {
                 .build();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    void getAllPerfectWithSpecificationTest() {
+    void getAllPerfectWithSearchRequestTest() {
         final Pageable pageable = Pageable.ofSize(10);
         this.baseTest
                 .given(() -> {
-                    when(clientRepository
-                            .findAll(any(Specification.class), any(Pageable.class)))
-                            .thenReturn(
-                                    new PageImpl<>(List.of(client1, client2)));
-                    return new Like<>(new DefaultQueryContext(), "clientEmail", "client");
+                    when(clientRepository.findBySearchRequest(any(ClientSearchRequest.class), any(Pageable.class)))
+                            .thenReturn(new SliceImpl<>(List.of(client1, client2), pageable, false));
+                    return new ClientSearchRequest(null, null, null, null, "client");
                 })
                 .when((pageableData, request) -> {
                     GetAllClientService service = new GetAllClientService(clientRepository);
@@ -111,21 +105,18 @@ class GetAllClientServiceTest {
                 .then((request, response) -> {
                     assertNotNull(response);
                     assertEquals(2, response.getNumberOfElements());
-                    verify(clientRepository, times(1)).findAll(request, pageable);
-                    verify(clientRepository, never()).findAll(pageable);
+                    verify(clientRepository, times(1)).findBySearchRequest(request, pageable);
                 })
                 .execute(pageable);
     }
 
     @Test
-    void getAllPerfectWithNoSpecificationTest() {
+    void getAllPerfectWithNoSearchRequestTest() {
         final Pageable pageable = Pageable.ofSize(10);
         this.baseTest
                 .given(() -> {
-                    when(clientRepository
-                            .findAll(any(Pageable.class)))
-                            .thenReturn(
-                                    new PageImpl<>(List.of(client1, client2)));
+                    when(clientRepository.findBySearchRequest(isNull(), any(Pageable.class)))
+                            .thenReturn(new SliceImpl<>(List.of(client1, client2), pageable, false));
                     return null;
                 })
                 .when((pageableData, request) -> {
@@ -139,8 +130,7 @@ class GetAllClientServiceTest {
                 .then((request, response) -> {
                     assertNotNull(response);
                     assertEquals(2, response.getNumberOfElements());
-                    verify(clientRepository, times(1)).findAll(pageable);
-                    verify(clientRepository, never()).findAll(request, pageable);
+                    verify(clientRepository, times(1)).findBySearchRequest(isNull(), eq(pageable));
                 })
                 .execute(pageable);
     }

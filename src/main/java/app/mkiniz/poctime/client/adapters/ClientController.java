@@ -6,13 +6,8 @@ import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
-import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +23,7 @@ public class ClientController {
     private final UpdateBusinessUseCase<Tsid, UpdateClientRequest, ClientResponse> updateClientService;
     private final DeleteBusinessUseCase<Tsid, ClientResponse> deleteClientService;
     private final GetByIdBusinessUseCase<Tsid, ClientResponse> getClientByIdService;
-    private final GetAllBusinessUseCase<Specification<Client>, Maybe<Slice<ClientResponse>>> getAllClientService;
+    private final GetAllBusinessUseCase<ClientSearchRequest, Maybe<Slice<ClientResponse>>> getAllClientService;
     private final GetAllBusinessUseCase<String, Maybe<Slice<ClientProjectionResponse>>> getAllClientProjectionService;
 
 
@@ -39,14 +34,13 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<Slice<ClientResponse>> getAllClient(Pageable pageable,
-                                                              @And({
-                                                                      @Spec(path = "person.name", params = "name", spec = LikeIgnoreCase.class),
-                                                                      @Spec(path = "address.street", params = "street", spec = LikeIgnoreCase.class),
-                                                                      @Spec(path = "address.city", params = "city", spec = LikeIgnoreCase.class),
-                                                                      @Spec(path = "address.stateCode", params = "stateCode", spec = EqualIgnoreCase.class),
-                                                                      @Spec(path = "clientEmail", params = "email", spec = LikeIgnoreCase.class)
-                                                              }) Specification<Client> spec) {
-        return getAllClientService.execute(pageable, spec)
+                                                              @RequestParam(required = false) String name,
+                                                              @RequestParam(required = false) String street,
+                                                              @RequestParam(required = false) String city,
+                                                              @RequestParam(required = false) String stateCode,
+                                                              @RequestParam(required = false) String email) {
+        ClientSearchRequest searchRequest = new ClientSearchRequest(name, street, city, stateCode, email);
+        return getAllClientService.execute(pageable, searchRequest)
                 .map(clients -> ResponseEntity.status(HttpStatus.OK).body(clients))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }

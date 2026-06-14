@@ -10,11 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.jdbc.core.simple.JdbcClient;
 
 import java.util.List;
 
@@ -27,15 +25,6 @@ class GetAllPersonServiceTest {
 
     @Mock
     private PersonRepository personRepository;
-
-    @Mock
-    private JdbcClient jdbcClient;
-
-    @Mock
-    private JdbcClient.StatementSpec statementSpec;
-
-    @Mock
-    private JdbcClient.MappedQuerySpec<Person> mappedQuerySpec;
 
     private GetAllBaseBusinessTest<PersonSearchRequest, Slice<PersonResponse>> baseTest;
 
@@ -54,16 +43,15 @@ class GetAllPersonServiceTest {
                             Person.builder().id(1L).name("name-1").build(),
                             Person.builder().id(2L).name("name-2").build()
                     );
+                    Slice<Person> slice = new SliceImpl<>(people, pageable, false);
 
-                    when(jdbcClient.sql(anyString())).thenReturn(statementSpec);
-                    when(statementSpec.param(anyString(), any())).thenReturn(statementSpec);
-                    when(statementSpec.query(Person.class)).thenReturn(mappedQuerySpec);
-                    when(mappedQuerySpec.list()).thenReturn(people);
+                    when(personRepository.findBySearchRequest(any(PersonSearchRequest.class), any(Pageable.class)))
+                            .thenReturn(slice);
 
                     return new PersonSearchRequest("name", null);
                 })
                 .when((pageableData, request) -> {
-                    GetAllPersonService service = new GetAllPersonService(personRepository, jdbcClient);
+                    GetAllPersonService service = new GetAllPersonService(personRepository);
                     return service.execute(pageableData, request)
                             .fold(
                                     slice -> slice,
@@ -73,6 +61,7 @@ class GetAllPersonServiceTest {
                 .then((request, response) -> {
                     assertNotNull(response);
                     assertEquals(2, response.getNumberOfElements());
+                    verify(personRepository, times(1)).findBySearchRequest(any(PersonSearchRequest.class), eq(pageable));
                 })
                 .execute(pageable);
     }
@@ -82,17 +71,18 @@ class GetAllPersonServiceTest {
         final Pageable pageable = Pageable.ofSize(10);
         this.baseTest
                 .given(() -> {
-                    when(personRepository
-                            .findAll(any(Pageable.class)))
-                            .thenReturn(
-                                    new PageImpl<>(List.of(
-                                            Person.builder().id(1L).name("name-1").build(),
-                                            Person.builder().id(2L).name("name-2").build()
-                                    )));
+                    List<Person> people = List.of(
+                            Person.builder().id(1L).name("name-1").build(),
+                            Person.builder().id(2L).name("name-2").build()
+                    );
+                    Slice<Person> slice = new SliceImpl<>(people, pageable, false);
+
+                    when(personRepository.findBySearchRequest(isNull(), any(Pageable.class)))
+                            .thenReturn(slice);
                     return null;
                 })
                 .when((pageableData, request) -> {
-                    GetAllPersonService service = new GetAllPersonService(personRepository, jdbcClient);
+                    GetAllPersonService service = new GetAllPersonService(personRepository);
                     return service.execute(pageableData, request)
                             .fold(
                                     slice -> slice,
@@ -102,7 +92,7 @@ class GetAllPersonServiceTest {
                 .then((request, response) -> {
                     assertNotNull(response);
                     assertEquals(2, response.getNumberOfElements());
-                    verify(personRepository, times(1)).findAll(pageable);
+                    verify(personRepository, times(1)).findBySearchRequest(isNull(), eq(pageable));
                 })
                 .execute(pageable);
     }

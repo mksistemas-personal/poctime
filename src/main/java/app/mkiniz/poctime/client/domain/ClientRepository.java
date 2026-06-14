@@ -1,28 +1,25 @@
 package app.mkiniz.poctime.client.domain;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.domain.Slice;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface ClientRepository extends
-        JpaRepository<Client, Long>,
-        JpaSpecificationExecutor<Client>,
-        ClientProjectionRepository {
+public interface ClientRepository extends ClientProjectionRepository {
+    Optional<Client> findById(Long id);
+
+    long count();
+
     Optional<Client> findByPersonId(Long personId);
 
     boolean existsByPersonId(Long personId);
 
-    @EntityGraph(attributePaths = {"person"})
-    Page<Client> findAll(@Nullable Specification<Client> spec, Pageable pageable);
+    Slice<Client> findBySearchRequest(@Nullable ClientSearchRequest spec, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"person"})
-    Page<Client> findAll(Pageable pageable);
+    Slice<Client> findAll(Pageable pageable);
+
+    Client save(Client client);
+
+    void delete(Client client);
 }

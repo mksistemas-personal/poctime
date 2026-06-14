@@ -9,14 +9,11 @@ import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
 import cyclops.control.Either;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.domain.AbstractAggregateRoot;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Collection;
 import java.util.Objects;
 
-@Table(name = "person")
 @Getter
 @Setter
 @Builder(toBuilder = true)
@@ -24,21 +21,28 @@ import java.util.Objects;
 @AllArgsConstructor
 public class Person extends AbstractAggregateRoot<Person> implements EntityCreated, EntityUpdated, EntityDeleted {
 
-    @Id
-    @Column("id")
     private Long id;
 
     private String name;
 
-    @Column("document")
     private Document<?, ?> document;
 
     public Document<?, ?> getDocument() {
         return document;
     }
 
-    @Column("deleted")
+    @Builder.Default
     private boolean deleted = false;
+
+    @Override
+    public Collection<Object> domainEvents() {
+        return super.domainEvents();
+    }
+
+    @Override
+    public void clearDomainEvents() {
+        super.clearDomainEvents();
+    }
 
     public PersonKindEnumeration whatKind() {
         if (Objects.isNull(document)) return PersonKindEnumeration.UNKNOWN;
