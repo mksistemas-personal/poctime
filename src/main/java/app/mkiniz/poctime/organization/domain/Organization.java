@@ -10,45 +10,41 @@ import app.mkiniz.poctime.shared.business.EntityUpdated;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Either;
 import cyclops.control.Try;
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.util.Collection;
 import java.util.Objects;
 
-@Entity
-@Table(name = "organization")
 @Getter
 @Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE organization SET deleted = true WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class Organization extends AbstractAggregateRoot<Organization> implements EntityCreated, EntityUpdated, EntityDeleted {
 
-    @Id
-    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_id", foreignKey = @ForeignKey(name = "fk_organization_person"))
     private Person person;
 
-    @Embedded
     private Address address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "responsible_id", foreignKey = @ForeignKey(name = "fk_organization_responsible"))
     private Person responsiblePerson;
 
-    @Column(name = "responsible_email", columnDefinition = "varchar(255)")
     private String responsibleEmail;
 
-    @Column(name = "deleted", nullable = false)
+    @Builder.Default
     private boolean deleted = false;
+
+    @Override
+    public Collection<Object> domainEvents() {
+        return super.domainEvents();
+    }
+
+    @Override
+    public void clearDomainEvents() {
+        super.clearDomainEvents();
+    }
 
     public Either<BusinessException, Organization> valid() {
         return Try.withCatch(() -> {

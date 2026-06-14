@@ -7,13 +7,8 @@ import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import net.kaczmarzyk.spring.data.jpa.domain.EqualIgnoreCase;
-import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +27,7 @@ public class OrganizationController {
     private final UpdateBusinessUseCase<Tsid, UpdateOrganizationRequest, OrganizationResponse> updateOrganizationService;
     private final DeleteBusinessUseCase<Tsid, OrganizationResponse> deleteOrganizationService;
     private final GetByIdBusinessUseCase<Tsid, OrganizationResponse> getOrganizationByIdService;
-    private final GetAllBusinessUseCase<Specification<Organization>, Maybe<Slice<OrganizationResponse>>> getAllOrganizationService;
+    private final GetAllBusinessUseCase<OrganizationSearchRequest, Maybe<Slice<OrganizationResponse>>> getAllOrganizationService;
     private final GetAllBusinessUseCase<String, Maybe<Slice<OrganizationProjectionResponse>>> getAllOrganizationProjectionService;
     private final GetOrganizationFromListUseCase getOrganizationFromListUseCase;
 
@@ -60,16 +55,15 @@ public class OrganizationController {
 
     @GetMapping
     public ResponseEntity<Slice<OrganizationResponse>> getAllOrganizations(
-            @And({
-                    @Spec(path = "person.name", params = "name", spec = LikeIgnoreCase.class),
-                    @Spec(path = "responsiblePerson.name", params = "respName", spec = LikeIgnoreCase.class),
-                    @Spec(path = "responsibleEmail", params = "responsibleEmail", spec = LikeIgnoreCase.class),
-                    @Spec(path = "address.street", params = "street", spec = LikeIgnoreCase.class),
-                    @Spec(path = "address.city", params = "city", spec = LikeIgnoreCase.class),
-                    @Spec(path = "address.stateCode", params = "stateCode", spec = EqualIgnoreCase.class)
-
-            }) Specification<Organization> spec, Pageable pageable) {
-        return getAllOrganizationService.execute(pageable, spec)
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String respName,
+            @RequestParam(required = false) String responsibleEmail,
+            @RequestParam(required = false) String street,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String stateCode,
+            Pageable pageable) {
+        OrganizationSearchRequest searchRequest = new OrganizationSearchRequest(name, respName, responsibleEmail, street, city, stateCode);
+        return getAllOrganizationService.execute(pageable, searchRequest)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }
 
