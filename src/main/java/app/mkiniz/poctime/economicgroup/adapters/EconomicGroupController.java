@@ -2,6 +2,7 @@ package app.mkiniz.poctime.economicgroup.adapters;
 
 import app.mkiniz.poctime.economicgroup.domain.EconomicGroupRequest;
 import app.mkiniz.poctime.economicgroup.domain.EconomicGroupResponse;
+import app.mkiniz.poctime.economicgroup.domain.EconomicGroupSearchRequest;
 import app.mkiniz.poctime.shared.business.*;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Maybe;
@@ -24,7 +25,7 @@ public class EconomicGroupController {
     private final UpdateBusinessUseCase<Tsid, EconomicGroupRequest, EconomicGroupResponse> updateEconomicGroupService;
     private final DeleteBusinessUseCase<Tsid, EconomicGroupResponse> deleteEconomicGroupService;
     private final GetByIdBusinessUseCase<Tsid, EconomicGroupResponse> getIdEconomicGroupService;
-    private final GetAllBusinessUseCase<String, Maybe<Slice<EconomicGroupResponse>>> getAllEconomicGroupService;
+    private final GetAllBusinessUseCase<EconomicGroupSearchRequest, Maybe<Slice<EconomicGroupResponse>>> getAllEconomicGroupService;
 
     @PostMapping
     public ResponseEntity<EconomicGroupResponse> createEconomicGroup(@Valid @RequestBody EconomicGroupRequest request) {
@@ -56,8 +57,8 @@ public class EconomicGroupController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<EconomicGroupResponse>> getAllEconomicGroup(@RequestParam(required = false) String term, Pageable pageable) {
-        return getAllEconomicGroupService.execute(pageable, term)
+    public ResponseEntity<Slice<EconomicGroupResponse>> getAllEconomicGroup(EconomicGroupSearchRequest request, Pageable pageable) {
+        return getAllEconomicGroupService.execute(pageable, request)
                 .fold(ResponseEntity::ok, () -> ResponseEntity.noContent().build());
     }
 

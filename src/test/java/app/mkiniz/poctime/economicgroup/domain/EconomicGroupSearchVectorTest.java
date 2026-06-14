@@ -26,7 +26,7 @@ class EconomicGroupSearchVectorTest extends BaseIntegrationTest {
                     .organizationIds(Set.of("ORG1", "ORG2"))
                     .build();
 
-            EconomicGroup saved = repository.saveAndFlush(group);
+            EconomicGroup saved = repository.save(group);
             assertThat(saved).isNotNull();
         } catch (Exception e) {
             System.out.println("Ignorando erro de DB no teste H2: " + e.getMessage());

@@ -39,6 +39,7 @@ class AddEconomicGroupService implements
     }
 
     private Either<? extends BusinessException, Context> saveEconomicGroup(Context context) {
+        context.economicGroup.created();
         context.economicGroup = economicGroupRepository.save(context.economicGroup);
         return Either.right(context);
     }

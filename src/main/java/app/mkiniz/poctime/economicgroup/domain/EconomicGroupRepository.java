@@ -1,23 +1,26 @@
 package app.mkiniz.poctime.economicgroup.domain;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Slice;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
-@Repository
-public interface EconomicGroupRepository extends
-        JpaRepository<EconomicGroup, Long>,
-        JpaSpecificationExecutor<EconomicGroup> {
+public interface EconomicGroupRepository {
     boolean existsByName(String name);
 
-    List<EconomicGroup> findAll(Specification<EconomicGroup> spec);
+    long count();
 
-    Page<EconomicGroup> findAll(Specification<EconomicGroup> spec, Pageable pageable);
+    Slice<EconomicGroup> findAll(@Nullable EconomicGroupSearchRequest request, Pageable pageable);
 
-    Page<EconomicGroup> findAll(Pageable pageable);
+    Slice<EconomicGroup> findAll(Pageable pageable);
+
+    Optional<EconomicGroup> findById(Long id);
+
+    List<EconomicGroup> findAllByOrganizationId(String organizationId);
+
+    EconomicGroup save(EconomicGroup economicGroup);
+
+    void delete(EconomicGroup economicGroup);
 }

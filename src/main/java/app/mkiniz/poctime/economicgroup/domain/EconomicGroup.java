@@ -7,51 +7,42 @@ import app.mkiniz.poctime.shared.business.EntityDeleted;
 import app.mkiniz.poctime.shared.business.EntityUpdated;
 import cyclops.control.Either;
 import cyclops.control.Try;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.generator.EventType;
-import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
-@Table(name = "economicgroup")
 @Getter
 @Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE economicgroup SET deleted = true WHERE id = ?")
-@SQLRestriction("deleted = false")
 public class EconomicGroup extends AbstractAggregateRoot<EconomicGroup> implements EntityCreated, EntityUpdated, EntityDeleted {
 
-    @Id
-    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "bigint")
     private Long id;
 
     private String name;
 
     private String description;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "\"organization-ids\"", columnDefinition = "jsonb", nullable = false)
     private Set<String> organizationIds;
 
-    @Column(name = "deleted", nullable = false)
+    @Builder.Default
     private boolean deleted = false;
 
-    @Generated(event = {EventType.INSERT, EventType.UPDATE})
-    @Column(name = "search_vector", columnDefinition = "tsvector", insertable = false, updatable = false)
     private Object searchVector;
+
+    @Override
+    public Collection<Object> domainEvents() {
+        return super.domainEvents();
+    }
+
+    @Override
+    public void clearDomainEvents() {
+        super.clearDomainEvents();
+    }
 
     public Either<BusinessException, EconomicGroup> valid() {
         return Try.withCatch(() -> {

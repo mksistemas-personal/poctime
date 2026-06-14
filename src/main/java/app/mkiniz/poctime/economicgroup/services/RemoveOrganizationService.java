@@ -5,9 +5,7 @@ import app.mkiniz.poctime.economicgroup.domain.EconomicGroup;
 import app.mkiniz.poctime.economicgroup.domain.EconomicGroupRepository;
 import com.github.f4b6a3.tsid.Tsid;
 import cyclops.control.Eval;
-import jakarta.persistence.criteria.Expression;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,24 +20,6 @@ import java.util.TreeSet;
 class RemoveOrganizationService implements RemoveOrganizationUseCase {
 
     private final EconomicGroupRepository economicGroupRepository;
-
-    public static Specification<EconomicGroup> hasOrganizationId(String organizationId) {
-        return (root, query, cb) -> {
-            if (organizationId == null || organizationId.isBlank()) {
-                return cb.conjunction();
-            }
-            Expression<Object> tsQuery = cb.function(
-                    "to_tsquery",
-                    Object.class,
-                    cb.literal("simple"),
-                    cb.lower(cb.literal(organizationId))
-            );
-
-            return cb.isTrue(
-                    cb.function("ts_match", Boolean.class, root.get("searchVector"), tsQuery)
-            );
-        };
-    }
 
     @Override
     public RemoveOrganizationResponse execute(RemoveOrganizationRequest request) {
@@ -63,7 +43,7 @@ class RemoveOrganizationService implements RemoveOrganizationUseCase {
 
     private Context findAllGroups(Context context) {
         context.groups = context.ids.stream()
-                .flatMap(orgId -> economicGroupRepository.findAll(hasOrganizationId(orgId)).stream())
+                .flatMap(orgId -> economicGroupRepository.findAllByOrganizationId(orgId).stream())
                 .toList();
         return context;
     }
