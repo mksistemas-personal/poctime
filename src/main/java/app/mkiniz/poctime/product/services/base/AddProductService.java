@@ -60,7 +60,7 @@ class AddProductService implements AddBusinessUseCase<CreateProductRequest, Prod
 
     private Either<BusinessException, Context> createProduct(Context context) {
         context.product = Product.builder()
-                .id(new TsidGenerator().newIdAsLong())
+                .id(tsidGenerator.newIdAsLong())
                 .name(context.request.name())
                 .category(context.category)
                 .sku(context.request.sku())

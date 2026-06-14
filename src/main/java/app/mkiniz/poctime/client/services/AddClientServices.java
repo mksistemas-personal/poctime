@@ -28,6 +28,7 @@ class AddClientServices implements AddBusinessUseCase<ClientRequest, ClientRespo
     private final ClientRepository clientRepository;
     private final PersonProvider personProvider;
     private final BeanFactory beanFactory;
+    private final TsidGenerator tsidGenerator;
 
     @Override
     public ClientResponse execute(ClientRequest clientRequest) {
@@ -51,7 +52,7 @@ class AddClientServices implements AddBusinessUseCase<ClientRequest, ClientRespo
 
     private Either<BusinessException, Context> createClient(Context context) {
         context.client = Client.builder()
-                .id(new TsidGenerator().newIdAsLong())
+                .id(tsidGenerator.newIdAsLong())
                 .person(context.person)
                 .clientEmail(context.request.clientEmail())
                 .address(context.addressCountry.canonicalize(context.request.address()))

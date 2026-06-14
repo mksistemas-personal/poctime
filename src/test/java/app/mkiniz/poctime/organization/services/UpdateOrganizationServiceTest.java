@@ -11,6 +11,7 @@ import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.UpdateBaseBusinessTest;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
+import app.mkiniz.poctime.shared.adapter.TsidGeneratorImpl;
 import com.github.f4b6a3.tsid.Tsid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,7 +67,7 @@ class UpdateOrganizationServiceTest {
     @BeforeEach
     void setUp() {
         this.baseTest = UpdateBaseBusinessTest.of();
-        TsidGenerator generator = new TsidGenerator();
+        TsidGenerator generator = new TsidGeneratorImpl();
         this.personId = generator.newTsid();
         this.responsibleId = generator.newTsid();
         this.address = Address.builder()

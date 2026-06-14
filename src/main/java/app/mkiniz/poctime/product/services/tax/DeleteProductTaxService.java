@@ -57,7 +57,8 @@ public class DeleteProductTaxService
 
     private Either<BusinessException, Context> deleteTaxData(Context context) {
         Optional<HistoryEntity> toAdjust = historyService.adjustFromDeletedHistory(context.taxData);
-        productTaxDataRepository.delete(context.taxData);
+        context.taxData.setDeleted(true);
+        productTaxDataRepository.save(context.taxData);
         toAdjust.ifPresent(entity -> productTaxDataRepository.save((ProductTaxData) toAdjust.get()));
         return Either.right(context);
     }

@@ -5,6 +5,7 @@ import app.mkiniz.poctime.product.domain.category.Category;
 import app.mkiniz.poctime.product.domain.category.CategoryRepository;
 import app.mkiniz.poctime.shared.UpdateBaseBusinessTest;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
+import app.mkiniz.poctime.shared.adapter.TsidGeneratorImpl;
 import com.github.f4b6a3.tsid.Tsid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class UpdateProductServiceTest {
     @BeforeEach
     void setUp() {
         this.baseTest = UpdateBaseBusinessTest.of();
-        TsidGenerator generator = new TsidGenerator();
+        TsidGenerator generator = new TsidGeneratorImpl();
         this.productId = generator.newTsid();
         this.categoryId = generator.newTsid();
 
@@ -96,7 +97,7 @@ class UpdateProductServiceTest {
 
     @Test
     void updateProductWithNewCategory() {
-        Tsid newCategoryId = new TsidGenerator().newTsid();
+        Tsid newCategoryId = new TsidGeneratorImpl().newTsid();
         Category newCategory = Category.builder()
                 .id(newCategoryId.toLong())
                 .name("New Category")
@@ -105,8 +106,7 @@ class UpdateProductServiceTest {
         this.baseTest
                 .given(() -> {
                     when(productRepository.findById(productId.toLong())).thenReturn(Optional.of(product));
-                    when(tsidGenerator.newIdAsLong()).thenReturn(newCategoryId.toLong());
-                    when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
+                    lenient().when(categoryRepository.save(any(Category.class))).thenReturn(newCategory);
                     when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
                     return new UpdateProductRequest("New Name", new CategoryRequest(null, "New Category"), "NEW-SKU", "New Description");
                 })

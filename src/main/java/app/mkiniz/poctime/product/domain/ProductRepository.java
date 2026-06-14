@@ -1,9 +1,16 @@
 package app.mkiniz.poctime.product.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@Repository
-public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+import java.util.Optional;
+
+public interface ProductRepository {
+    Optional<Product> findById(Long id);
+
+    Product save(Product product);
+
+    void deleteById(Long id);
+
+    Page<Product> findAll(ProductSearchRequest request, Pageable pageable);
 }

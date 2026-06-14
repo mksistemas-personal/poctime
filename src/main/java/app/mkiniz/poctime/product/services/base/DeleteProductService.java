@@ -32,7 +32,8 @@ class DeleteProductService implements DeleteBusinessUseCase<Tsid, ProductRespons
 
     private Either<? extends BusinessException, ? extends Product> deleteProduct(Product product) {
         product.deleted();
-        productRepository.delete(product);
+        product.setDeleted(true);
+        productRepository.save(product);
         return Either.right(product);
     }
 

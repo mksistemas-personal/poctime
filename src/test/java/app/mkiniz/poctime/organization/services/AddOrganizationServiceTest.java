@@ -12,6 +12,7 @@ import app.mkiniz.poctime.person.PersonProvider;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.AddBaseBusinessTest;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
+import app.mkiniz.poctime.shared.adapter.TsidGeneratorImpl;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import com.github.f4b6a3.tsid.Tsid;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,9 @@ class AddOrganizationServiceTest {
     @Mock
     private BeanFactory beanFactory;
 
+    @Mock
+    private TsidGenerator tsidGenerator;
+
     @InjectMocks
     private AddOrganizationService addOrganizationService;
 
@@ -65,7 +69,7 @@ class AddOrganizationServiceTest {
     @BeforeEach
     void setUp() {
         this.baseTest = AddBaseBusinessTest.of();
-        TsidGenerator generator = new TsidGenerator();
+        TsidGenerator generator = new TsidGeneratorImpl();
         this.personId = generator.newTsid();
         this.responsibleId = generator.newTsid();
         this.address = Address.builder()

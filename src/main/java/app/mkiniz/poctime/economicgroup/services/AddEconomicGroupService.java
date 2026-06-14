@@ -25,6 +25,7 @@ class AddEconomicGroupService implements
 
     private final EconomicGroupRepository economicGroupRepository;
     private final OrganizationProvider organizationProvider;
+    private final TsidGenerator tsidGenerator;
 
     @Override
     public EconomicGroupResponse execute(EconomicGroupRequest economicGroupRequest) {
@@ -51,7 +52,7 @@ class AddEconomicGroupService implements
 
     private Either<? extends BusinessException, Context> createEconomicGroup(Context context) {
         context.economicGroup = EconomicGroup.builder()
-                .id(new TsidGenerator().newIdAsLong())
+                .id(tsidGenerator.newIdAsLong())
                 .name(context.request.name())
                 .description(context.request.description())
                 .organizationIds(new HashSet<>(context.request.organizationIds()))

@@ -14,6 +14,7 @@ import app.mkiniz.poctime.product.domain.tax.ProductTaxData;
 import app.mkiniz.poctime.product.domain.tax.ProductTaxDataRepository;
 import app.mkiniz.poctime.product.domain.tax.ProductTaxResponse;
 import app.mkiniz.poctime.shared.adapter.TsidGenerator;
+import app.mkiniz.poctime.shared.adapter.TsidGeneratorImpl;
 import app.mkiniz.poctime.shared.business.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.f4b6a3.tsid.Tsid;
@@ -50,7 +51,7 @@ class AddProductTaxServiceTest {
         productTaxDataRepository = mock(ProductTaxDataRepository.class);
         productRepository = mock(ProductRepository.class);
         ncmService = mock(NCMService.class);
-        tsidGenerator = new TsidGenerator();
+        tsidGenerator = new TsidGeneratorImpl();
         csvRepository = new CSTRepository(new ObjectMapper(), new DefaultResourceLoader());
         csvRepository.loadCsv();
         cfopRepository = new CFOPRepository(new ObjectMapper(), new DefaultResourceLoader());

@@ -26,6 +26,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
     private final OrganizationRepository organizationRepository;
     private final PersonProvider personProvider;
     private final BeanFactory beanFactory;
+    private final TsidGenerator tsidGenerator;
 
     @Override
     public OrganizationResponse execute(OrganizationRequest request) {
@@ -51,7 +52,7 @@ class AddOrganizationService implements AddBusinessUseCase<OrganizationRequest, 
 
     private Either<BusinessException, Context> createOrganization(Context context) {
         context.organization = Organization.builder()
-                .id(new TsidGenerator().newIdAsLong())
+                .id(tsidGenerator.newIdAsLong())
                 .person(context.person)
                 .responsiblePerson(context.responsiblePerson)
                 .responsibleEmail(context.getResponsibleEmail())

@@ -7,7 +7,7 @@ import app.mkiniz.poctime.client.domain.ClientRepository;
 import app.mkiniz.poctime.client.domain.ClientResponse;
 import app.mkiniz.poctime.person.domain.Person;
 import app.mkiniz.poctime.shared.DeleteBaseBusinessTest;
-import app.mkiniz.poctime.shared.adapter.TsidGenerator;
+import app.mkiniz.poctime.shared.adapter.TsidGeneratorImpl;
 import com.github.f4b6a3.tsid.Tsid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,8 +27,7 @@ class DeleteClientServiceTest {
     @Mock
     private ClientRepository clientRepository;
 
-    @InjectMocks
-    private TsidGenerator generator;
+    private TsidGeneratorImpl generator = new TsidGeneratorImpl();
 
     @InjectMocks
     private DeleteClientService deleteClientService;
