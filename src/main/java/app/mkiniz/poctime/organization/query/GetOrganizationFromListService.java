@@ -1,67 +1,71 @@
 package app.mkiniz.poctime.organization.query;
 
 import app.mkiniz.poctime.base.document.Document;
-import app.mkiniz.poctime.base.document.DocumentConverter;
 import app.mkiniz.poctime.organization.GetOrganizationFromListUseCase;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.f4b6a3.tsid.Tsid;
-import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
-import org.hibernate.query.NativeQuery;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
 @AllArgsConstructor
 class GetOrganizationFromListService implements GetOrganizationFromListUseCase {
 
-    private static final String selectQuery = """
-            select
-                o.id,
-                p.name,
-                p.document
-            from
-                organization o inner join person p on o.person_id = p.id
-            where
-                o.deleted = false AND
-                (CAST(:ids AS bigint[]) is null OR o.id = ANY(CAST(:ids AS bigint[])))
-            """;
-    private final EntityManager entityManager;
+    private final JdbcClient jdbcClient;
     private final ObjectMapper mapper;
 
-    @SuppressWarnings("unchecked")
     @Override
     public Slice<OrganizationListView> execute(OrganizationListRequest organizationListRequest) {
-        Long[] ids = null;
-        if (!Objects.isNull(organizationListRequest.ids()))
-            ids = organizationListRequest.ids().stream().map(Tsid::toLong).toArray(Long[]::new);
-        NativeQuery<OrganizationListView> query = entityManager.createNativeQuery(selectQuery)
-                .unwrap(NativeQuery.class)
-                .setParameter("ids", ids, Long[].class)
-                .setTupleTransformer(OrganizationListViewImpl::new);
-        List<OrganizationListView> result = query.getResultList();
+        StringBuilder sql = new StringBuilder("""
+                SELECT
+                    o.id,
+                    p.name,
+                    p.document::text as document_json
+                FROM
+                    organization o INNER JOIN person p ON o.person_id = p.id
+                WHERE
+                    o.deleted = false
+                """);
+
+        Map<String, Object> params = new HashMap<>();
+        if (organizationListRequest.ids() != null && !organizationListRequest.ids().isEmpty()) {
+            sql.append(" AND o.id IN (:ids)");
+            params.put("ids", organizationListRequest.ids().stream().map(Tsid::toLong).toList());
+        }
+
+        List<OrganizationListView> result = jdbcClient.sql(sql.toString())
+                .params(params)
+                .query((rs, rowNum) -> {
+                    long id = rs.getLong("id");
+                    String name = rs.getString("name");
+                    String documentJson = rs.getString("document_json");
+                    Document<?, ?> document = null;
+                    try {
+                        if (documentJson != null) {
+                            document = mapper.readValue(documentJson, Document.class);
+                        }
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return (OrganizationListView) new OrganizationListViewDto(Tsid.from(id).toLowerCase(), name, document);
+                })
+                .list();
+
         return new SliceImpl<>(result);
     }
 
-    private static class OrganizationListViewImpl implements OrganizationListView {
-
-        private final String id;
-        private final String name;
-        private final Document<?, ?> document;
-
-        public OrganizationListViewImpl(Object[] tuples, String[] alias) {
-            id = Tsid.from((Long) tuples[0]).toLowerCase();
-            name = (String) tuples[1];
-            DocumentConverter converter = new DocumentConverter();
-            document = converter.convertToEntityAttribute((String) tuples[2]);
-        }
-
+    private record OrganizationListViewDto(String id, String name,
+                                           Document<?, ?> document) implements OrganizationListView {
         @Override
         public String getId() {
             return id;

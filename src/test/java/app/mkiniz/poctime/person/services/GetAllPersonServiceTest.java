@@ -33,9 +33,8 @@ class GetAllPersonServiceTest {
         this.baseTest = GetAllBaseBusinessTest.of();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    void getAllPerfectWithSpecificationTest() {
+    void getAllPerfectWithSearchRequestTest() {
         final Pageable pageable = Pageable.ofSize(10);
         this.baseTest
                 .given(() -> {
@@ -67,7 +66,7 @@ class GetAllPersonServiceTest {
     }
 
     @Test
-    void getAllPerfectWithNoSpecificationTest() {
+    void getAllPerfectWithNoSearchRequestTest() {
         final Pageable pageable = Pageable.ofSize(10);
         this.baseTest
                 .given(() -> {

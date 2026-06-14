@@ -1,10 +1,10 @@
 package app.mkiniz.poctime.base.address;
 
-import jakarta.persistence.Embeddable;
 import lombok.Builder;
+import lombok.extern.jackson.Jacksonized;
 
 @Builder(toBuilder = true)
-@Embeddable
+@Jacksonized
 public record Address(
         String street,
         String number,
