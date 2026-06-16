@@ -109,37 +109,22 @@ public class PersonJdbcRepository implements PersonRepository {
     }
 
     public Person save(Person person) {
-        boolean exists = jdbcClient.sql("SELECT count(*) FROM person WHERE id = :id")
+        jdbcClient.sql("""
+                        INSERT INTO person (id, name, document, deleted)
+                        VALUES (:id, :name, :document, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            name = EXCLUDED.name,
+                            document = EXCLUDED.document,
+                            deleted = EXCLUDED.deleted
+                        """)
                 .param("id", person.getId())
-                .query(Integer.class)
-                .single() > 0;
-
-        if (exists) {
-            update(person);
-        } else {
-            insert(person);
-        }
+                .param("name", person.getName())
+                .param("document", toJsonb(person.getDocument()))
+                .param("deleted", person.isDeleted())
+                .update();
 
         publishEvents(person);
         return person;
-    }
-
-    private void insert(Person person) {
-        jdbcClient.sql("INSERT INTO person (id, name, document, deleted) VALUES (:id, :name, :document, :deleted)")
-                .param("id", person.getId())
-                .param("name", person.getName())
-                .param("document", toJsonb(person.getDocument()))
-                .param("deleted", person.isDeleted())
-                .update();
-    }
-
-    private void update(Person person) {
-        jdbcClient.sql("UPDATE person SET name = :name, document = :document, deleted = :deleted WHERE id = :id")
-                .param("id", person.getId())
-                .param("name", person.getName())
-                .param("document", toJsonb(person.getDocument()))
-                .param("deleted", person.isDeleted())
-                .update();
     }
 
     public void delete(Person person) {

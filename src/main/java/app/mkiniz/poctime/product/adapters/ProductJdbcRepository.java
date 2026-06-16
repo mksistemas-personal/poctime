@@ -74,7 +74,16 @@ public class ProductJdbcRepository implements ProductRepository {
             throw new IllegalArgumentException("Product id cannot be null");
         }
 
-        int updated = jdbcClient.sql("UPDATE product SET name = :name, description = :description, sku = :sku, category_id = :categoryId, deleted = :deleted WHERE id = :id")
+        jdbcClient.sql("""
+                        INSERT INTO product (id, name, description, sku, category_id, deleted)
+                        VALUES (:id, :name, :description, :sku, :categoryId, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            name = EXCLUDED.name,
+                            description = EXCLUDED.description,
+                            sku = EXCLUDED.sku,
+                            category_id = EXCLUDED.category_id,
+                            deleted = EXCLUDED.deleted
+                        """)
                 .param("id", product.getId())
                 .param("name", product.getName())
                 .param("description", product.getDescription())
@@ -82,17 +91,6 @@ public class ProductJdbcRepository implements ProductRepository {
                 .param("categoryId", product.getCategory() != null ? product.getCategory().getId() : null)
                 .param("deleted", product.isDeleted())
                 .update();
-
-        if (updated == 0) {
-            jdbcClient.sql("INSERT INTO product (id, name, description, sku, category_id, deleted) VALUES (:id, :name, :description, :sku, :categoryId, :deleted)")
-                    .param("id", product.getId())
-                    .param("name", product.getName())
-                    .param("description", product.getDescription())
-                    .param("sku", product.getSku())
-                    .param("categoryId", product.getCategory() != null ? product.getCategory().getId() : null)
-                    .param("deleted", product.isDeleted())
-                    .update();
-        }
 
         product.domainEvents().forEach(eventPublisher::publishEvent);
         product.clearDomainEvents();

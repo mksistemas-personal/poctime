@@ -157,25 +157,22 @@ class OrganizationJdbcRepository implements OrganizationRepository {
 
     @Override
     public Organization save(Organization organization) {
-        boolean exists = jdbcClient.sql("SELECT count(*) FROM organization WHERE id = :id")
-                .param("id", organization.getId())
-                .query(Integer.class)
-                .single() > 0;
-
-        if (exists) {
-            update(organization);
-        } else {
-            insert(organization);
-        }
-
-        publishEvents(organization);
-        return organization;
-    }
-
-    private void insert(Organization organization) {
         jdbcClient.sql("""
                         INSERT INTO organization (id, person_id, street, number, neighborhood, complement, city, state_code, country, zip_code, responsible_id, responsible_email, deleted)
                         VALUES (:id, :person_id, :street, :number, :neighborhood, :complement, :city, :state_code, :country_code, :zip_code, :responsible_id, :responsible_email, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            person_id = EXCLUDED.person_id,
+                            street = EXCLUDED.street,
+                            number = EXCLUDED.number,
+                            neighborhood = EXCLUDED.neighborhood,
+                            complement = EXCLUDED.complement,
+                            city = EXCLUDED.city,
+                            state_code = EXCLUDED.state_code,
+                            country = EXCLUDED.country,
+                            zip_code = EXCLUDED.zip_code,
+                            responsible_id = EXCLUDED.responsible_id,
+                            responsible_email = EXCLUDED.responsible_email,
+                            deleted = EXCLUDED.deleted
                         """)
                 .param("id", organization.getId())
                 .param("person_id", organization.getPerson().getId())
@@ -191,39 +188,9 @@ class OrganizationJdbcRepository implements OrganizationRepository {
                 .param("responsible_email", organization.getResponsibleEmail())
                 .param("deleted", organization.isDeleted())
                 .update();
-    }
 
-    private void update(Organization organization) {
-        jdbcClient.sql("""
-                        UPDATE organization SET 
-                            person_id = :person_id, 
-                            street = :street, 
-                            number = :number, 
-                            neighborhood = :neighborhood, 
-                            complement = :complement, 
-                            city = :city, 
-                            state_code = :state_code, 
-                            country = :country_code, 
-                            zip_code = :zip_code, 
-                            responsible_id = :responsible_id,
-                            responsible_email = :responsible_email,
-                            deleted = :deleted 
-                        WHERE id = :id
-                        """)
-                .param("id", organization.getId())
-                .param("person_id", organization.getPerson().getId())
-                .param("street", organization.getAddress().street())
-                .param("number", organization.getAddress().number())
-                .param("neighborhood", organization.getAddress().neighborhood())
-                .param("complement", organization.getAddress().complement())
-                .param("city", organization.getAddress().city())
-                .param("state_code", organization.getAddress().stateCode())
-                .param("country_code", organization.getAddress().country())
-                .param("zip_code", organization.getAddress().zipCode())
-                .param("responsible_id", organization.getResponsiblePerson().getId())
-                .param("responsible_email", organization.getResponsibleEmail())
-                .param("deleted", organization.isDeleted())
-                .update();
+        publishEvents(organization);
+        return organization;
     }
 
     @Override

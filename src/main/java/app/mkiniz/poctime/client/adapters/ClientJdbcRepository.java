@@ -131,25 +131,21 @@ class ClientJdbcRepository implements ClientRepository {
 
     @Override
     public Client save(Client client) {
-        boolean exists = jdbcClient.sql("SELECT count(*) FROM client WHERE id = :id")
-                .param("id", client.getId())
-                .query(Integer.class)
-                .single() > 0;
-
-        if (exists) {
-            update(client);
-        } else {
-            insert(client);
-        }
-
-        publishEvents(client);
-        return client;
-    }
-
-    private void insert(Client client) {
         jdbcClient.sql("""
                         INSERT INTO client (id, person_id, street, number, neighborhood, complement, city, state_code, country_code, zip_code, client_email, deleted)
                         VALUES (:id, :person_id, :street, :number, :neighborhood, :complement, :city, :state_code, :country_code, :zip_code, :client_email, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            person_id = EXCLUDED.person_id,
+                            street = EXCLUDED.street,
+                            number = EXCLUDED.number,
+                            neighborhood = EXCLUDED.neighborhood,
+                            complement = EXCLUDED.complement,
+                            city = EXCLUDED.city,
+                            state_code = EXCLUDED.state_code,
+                            country_code = EXCLUDED.country_code,
+                            zip_code = EXCLUDED.zip_code,
+                            client_email = EXCLUDED.client_email,
+                            deleted = EXCLUDED.deleted
                         """)
                 .param("id", client.getId())
                 .param("person_id", client.getPerson().getId())
@@ -164,37 +160,9 @@ class ClientJdbcRepository implements ClientRepository {
                 .param("client_email", client.getClientEmail())
                 .param("deleted", client.isDeleted())
                 .update();
-    }
 
-    private void update(Client client) {
-        jdbcClient.sql("""
-                        UPDATE client SET 
-                            person_id = :person_id, 
-                            street = :street, 
-                            number = :number, 
-                            neighborhood = :neighborhood, 
-                            complement = :complement, 
-                            city = :city, 
-                            state_code = :state_code, 
-                            country_code = :country_code, 
-                            zip_code = :zip_code, 
-                            client_email = :client_email, 
-                            deleted = :deleted 
-                        WHERE id = :id
-                        """)
-                .param("id", client.getId())
-                .param("person_id", client.getPerson().getId())
-                .param("street", client.getAddress().street())
-                .param("number", client.getAddress().number())
-                .param("neighborhood", client.getAddress().neighborhood())
-                .param("complement", client.getAddress().complement())
-                .param("city", client.getAddress().city())
-                .param("state_code", client.getAddress().stateCode())
-                .param("country_code", client.getAddress().country())
-                .param("zip_code", client.getAddress().zipCode())
-                .param("client_email", client.getClientEmail())
-                .param("deleted", client.isDeleted())
-                .update();
+        publishEvents(client);
+        return client;
     }
 
     @Override

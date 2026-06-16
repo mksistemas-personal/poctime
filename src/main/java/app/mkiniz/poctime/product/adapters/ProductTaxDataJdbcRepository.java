@@ -44,12 +44,21 @@ public class ProductTaxDataJdbcRepository implements ProductTaxDataRepository {
             throw new IllegalArgumentException("ProductTaxData id cannot be null");
         }
 
-        int updated = jdbcClient.sql("""
-                        UPDATE product_tax_data 
-                        SET product_id = :productId, ncm = :ncm, cst_ipi = :cstIpi, cst_pis = :cstPis, 
-                            cst_cofins = :cstCofins, cfop = :cfop, product_type = :productType, 
-                            origin = :origin, valid_from = :validFrom, valid_until = :validUntil, deleted = :deleted 
-                        WHERE id = :id
+        jdbcClient.sql("""
+                        INSERT INTO product_tax_data (id, product_id, ncm, cst_ipi, cst_pis, cst_cofins, cfop, product_type, origin, valid_from, valid_until, deleted)
+                        VALUES (:id, :productId, :ncm, :cstIpi, :cstPis, :cstCofins, :cfop, :productType, :origin, :validFrom, :validUntil, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            product_id = EXCLUDED.product_id,
+                            ncm = EXCLUDED.ncm,
+                            cst_ipi = EXCLUDED.cst_ipi,
+                            cst_pis = EXCLUDED.cst_pis,
+                            cst_cofins = EXCLUDED.cst_cofins,
+                            cfop = EXCLUDED.cfop,
+                            product_type = EXCLUDED.product_type,
+                            origin = EXCLUDED.origin,
+                            valid_from = EXCLUDED.valid_from,
+                            valid_until = EXCLUDED.valid_until,
+                            deleted = EXCLUDED.deleted
                         """)
                 .param("id", data.getId())
                 .param("productId", data.getProduct().getId())
@@ -64,26 +73,6 @@ public class ProductTaxDataJdbcRepository implements ProductTaxDataRepository {
                 .param("validUntil", data.getValidUntil())
                 .param("deleted", data.isDeleted())
                 .update();
-
-        if (updated == 0) {
-            jdbcClient.sql("""
-                            INSERT INTO product_tax_data (id, product_id, ncm, cst_ipi, cst_pis, cst_cofins, cfop, product_type, origin, valid_from, valid_until, deleted) 
-                            VALUES (:id, :productId, :ncm, :cstIpi, :cstPis, :cstCofins, :cfop, :productType, :origin, :validFrom, :validUntil, :deleted)
-                            """)
-                    .param("id", data.getId())
-                    .param("productId", data.getProduct().getId())
-                    .param("ncm", data.getNcm())
-                    .param("cstIpi", data.getCstIpi())
-                    .param("cstPis", data.getCstPis())
-                    .param("cstCofins", data.getCstCofins())
-                    .param("cfop", data.getCfop())
-                    .param("productType", data.getProductType().name())
-                    .param("origin", data.getOrigin().name())
-                    .param("validFrom", data.getValidFrom())
-                    .param("validUntil", data.getValidUntil())
-                    .param("deleted", data.isDeleted())
-                    .update();
-        }
 
         return data;
     }

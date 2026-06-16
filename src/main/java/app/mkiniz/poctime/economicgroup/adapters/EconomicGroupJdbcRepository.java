@@ -104,25 +104,14 @@ class EconomicGroupJdbcRepository implements EconomicGroupRepository {
 
     @Override
     public EconomicGroup save(EconomicGroup economicGroup) {
-        boolean exists = jdbcClient.sql("SELECT count(*) FROM economicgroup WHERE id = :id")
-                .param("id", economicGroup.getId())
-                .query(Integer.class)
-                .single() > 0;
-
-        if (exists) {
-            update(economicGroup);
-        } else {
-            insert(economicGroup);
-        }
-
-        publishEvents(economicGroup);
-        return economicGroup;
-    }
-
-    private void insert(EconomicGroup economicGroup) {
         jdbcClient.sql("""
                         INSERT INTO economicgroup (id, name, description, "organization-ids", deleted)
                         VALUES (:id, :name, :description, :organizationIds, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            name = EXCLUDED.name,
+                            description = EXCLUDED.description,
+                            "organization-ids" = EXCLUDED."organization-ids",
+                            deleted = EXCLUDED.deleted
                         """)
                 .param("id", economicGroup.getId())
                 .param("name", economicGroup.getName())
@@ -130,23 +119,9 @@ class EconomicGroupJdbcRepository implements EconomicGroupRepository {
                 .param("organizationIds", toJsonb(economicGroup.getOrganizationIds()))
                 .param("deleted", economicGroup.isDeleted())
                 .update();
-    }
 
-    private void update(EconomicGroup economicGroup) {
-        jdbcClient.sql("""
-                        UPDATE economicgroup SET 
-                            name = :name, 
-                            description = :description, 
-                            "organization-ids" = :organizationIds, 
-                            deleted = :deleted 
-                        WHERE id = :id
-                        """)
-                .param("id", economicGroup.getId())
-                .param("name", economicGroup.getName())
-                .param("description", economicGroup.getDescription())
-                .param("organizationIds", toJsonb(economicGroup.getOrganizationIds()))
-                .param("deleted", economicGroup.isDeleted())
-                .update();
+        publishEvents(economicGroup);
+        return economicGroup;
     }
 
     @Override

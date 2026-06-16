@@ -36,19 +36,17 @@ public class CategoryJdbcRepository implements CategoryRepository {
             throw new IllegalArgumentException("Category id cannot be null");
         }
 
-        int updated = jdbcClient.sql("UPDATE category SET name = :name, deleted = :deleted WHERE id = :id")
+        jdbcClient.sql("""
+                        INSERT INTO category (id, name, deleted)
+                        VALUES (:id, :name, :deleted)
+                        ON CONFLICT (id) DO UPDATE SET
+                            name = EXCLUDED.name,
+                            deleted = EXCLUDED.deleted
+                        """)
                 .param("id", category.getId())
                 .param("name", category.getName())
                 .param("deleted", category.isDeleted())
                 .update();
-
-        if (updated == 0) {
-            jdbcClient.sql("INSERT INTO category (id, name, deleted) VALUES (:id, :name, :deleted)")
-                    .param("id", category.getId())
-                    .param("name", category.getName())
-                    .param("deleted", category.isDeleted())
-                    .update();
-        }
 
         return category;
     }
