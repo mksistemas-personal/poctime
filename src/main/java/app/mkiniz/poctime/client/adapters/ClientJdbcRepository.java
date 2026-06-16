@@ -132,7 +132,7 @@ class ClientJdbcRepository implements ClientRepository {
     @Override
     public Client save(Client client) {
         jdbcClient.sql("""
-                        INSERT INTO client (id, person_id, street, number, neighborhood, complement, city, state_code, country_code, zip_code, client_email, deleted)
+                        INSERT INTO client (id, person_id, street, number, neighborhood, complement, city, state_code, country, zip_code, client_email, deleted)
                         VALUES (:id, :person_id, :street, :number, :neighborhood, :complement, :city, :state_code, :country_code, :zip_code, :client_email, :deleted)
                         ON CONFLICT (id) DO UPDATE SET
                             person_id = EXCLUDED.person_id,
@@ -142,7 +142,7 @@ class ClientJdbcRepository implements ClientRepository {
                             complement = EXCLUDED.complement,
                             city = EXCLUDED.city,
                             state_code = EXCLUDED.state_code,
-                            country_code = EXCLUDED.country_code,
+                            country = EXCLUDED.country,
                             zip_code = EXCLUDED.zip_code,
                             client_email = EXCLUDED.client_email,
                             deleted = EXCLUDED.deleted

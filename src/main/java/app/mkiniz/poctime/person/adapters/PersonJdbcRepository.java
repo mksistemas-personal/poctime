@@ -1,6 +1,9 @@
-package app.mkiniz.poctime.person.domain;
+package app.mkiniz.poctime.person.adapters;
 
 import app.mkiniz.poctime.base.document.Document;
+import app.mkiniz.poctime.person.domain.Person;
+import app.mkiniz.poctime.person.domain.PersonRepository;
+import app.mkiniz.poctime.person.domain.PersonSearchRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.postgresql.util.PGobject;
